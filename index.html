@@ -3,27 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Harapan Dandelion - 3D Interactive</title>
+    <title>Harapan Dandelion — 3D Cinematic</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Font Elegan dari Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Library Three.js untuk Animasi 3D -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <!-- Kanvas 3D Utama -->
     <div id="canvas-container"></div>
 
-    <!-- Audio Lagu Ruth B - Dandelions (Pastikan file dandelions.mp3 ada di folder GitHub) -->
+    <!-- Audio Ruth B - Dandelions (Upload dandelions.mp3 ke root repo GitHub jika ingin vokal asli) -->
     <audio id="bg-music" loop preload="auto">
         <source src="dandelions.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Tombol Kontrol Musik -->
-    <button id="music-toggle" class="glass-btn" title="Putar/Jeda Musik">🎵 Musik: OFF</button>
+    <button id="music-toggle" class="glass-btn">🎵 Musik: OFF</button>
 
-    <!-- Petunjuk Tap Layar -->
     <div id="ui-overlay">
         <div id="instruction-box">
             <p id="instruction-text">✨ Tap layar untuk menumbuhkan Dandelion ✨</p>
@@ -33,8 +28,7 @@
         </div>
     </div>
 
-    <!-- Teks Kata-kata Kehidupan di Akhir Animasi -->
-    <div id="quote-container" class="hidden">
+    <div id="quote-container">
         <div class="glowing-card">
             <h2 class="quote-title">Filosofi Dandelion</h2>
             <p class="quote-text">
