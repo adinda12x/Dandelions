@@ -1,55 +1,53 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dandelions — 3D Interactive</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Harapan Dandelion - Ruth B.</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Library Three.js untuk Animasi 3D -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <div id="canvas-container"></div>
+  <!-- Kontrol Audio di Pojok Kiri Atas -->
+  <div id="audio-controls">
+    <button id="btn-audio" title="Putar / Jeda Musik">🔇 Putar Musik</button>
+    <label for="upload-mp3" class="btn-upload" title="Pilih file dandelions.mp3 dari perangkat">📂 Pilih MP3</label>
+    <input type="file" id="upload-mp3" accept="audio/*">
+  </div>
 
-    <!-- Pemutar audio (otomatis cek dandelions.mp3 di GitHub atau lewat tombol Pilih Lagu) -->
-    <audio id="bg-music" loop preload="auto">
-        <source src="dandelions.mp3" type="audio/mpeg">
-    </audio>
-    <input type="file" id="audio-file-input" accept="audio/*" hidden>
+  <!-- Elemen Audio (Letakkan file dandelions.mp3 di folder yang sama saat upload ke GitHub) -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="dandelions.mp3" type="audio/mpeg">
+  </audio>
 
-    <!-- Kontrol Musik di Pojok Kanan Atas -->
-    <div class="top-controls">
-        <button id="upload-audio-btn" class="glass-btn" title="Pilih file lagu Dandelions dari HP/PC">📂 Pilih Lagu MP3</button>
-        <button id="music-toggle" class="glass-btn">🎵 Musik: OFF</button>
+  <!-- Indikator Progress & Petunjuk Tap Layar -->
+  <div id="ui-container">
+    <div id="tap-hint">✨ Tap layar untuk menumbuhkan Dandelion ✨</div>
+    <div id="progress-wrapper">
+      <div id="progress-bar"></div>
     </div>
+  </div>
 
-    <!-- Lirik berjalan selaras dengan irama -->
-    <div id="lyric-box" class="lyric-hidden">
-        <p id="lyric-line"></p>
+  <!-- Layar Akhir: Kata-Kata Kehidupan Bercahaya -->
+  <div id="quote-overlay" class="hidden">
+    <div class="quote-box">
+      <p class="glowing-text">
+        "Seperti bunga dandelion yang tumbuh sederhana di sudut taman,<br>
+        setiap harapan membutuhkan kesabaran untuk mekar.<br>
+        Dan ketika angin kehidupan datang menerbangkannya,<br>
+        jangan takut terlepas—sebab setiap benih yang terbang<br>
+        sedang mencari tempat baru untuk menumbuhkan keajaiban."
+      </p>
+      <span class="song-credit">♪ Dandelions — Ruth B.</span>
+      <button id="btn-replay">🌱 Tanam Harapan Baru</button>
     </div>
+  </div>
 
-    <!-- Petunjuk Tap Layar -->
-    <div id="ui-overlay">
-        <div id="instruction-box">
-            <p id="instruction-text">🌰 Tap layar — biji dandelion mulai bertunas...</p>
-            <div class="progress-bar">
-                <div id="growth-fill"></div>
-            </div>
-        </div>
-    </div>
+  <!-- Kanvas 3D -->
+  <div id="canvas-container"></div>
 
-    <!-- Kata-kata Kehidupan Bercahaya di Akhir Animasi -->
-    <div id="quote-container">
-        <div class="glowing-card">
-            <h2 class="quote-title">Filosofi Dandelion</h2>
-            <p class="quote-text">
-                "Dari sebutir biji kecil yang diam di tanah, tumbuh menjadi bunga kuning yang segar, lalu mekar menjadi kapas putih yang siap menari bersama angin. Hidup tidak pernah terburu-buru—ia hanya menunggu waktu terbaik untuk menerbangkan harapanmu."
-            </p>
-            <button id="replay-btn" class="glow-button">Ulangi Harapan ✨</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
