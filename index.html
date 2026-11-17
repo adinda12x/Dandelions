@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Harapan Dandelion - 3D Interactive</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Elegan dari Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Library Three.js untuk Animasi 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <!-- Kanvas 3D Utama -->
+    <div id="canvas-container"></div>
+
+    <!-- Audio Lagu Ruth B - Dandelions (Pastikan file dandelions.mp3 ada di folder GitHub) -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="dandelions.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Tombol Kontrol Musik -->
+    <button id="music-toggle" class="glass-btn" title="Putar/Jeda Musik">🎵 Musik: OFF</button>
+
+    <!-- Petunjuk Tap Layar -->
+    <div id="ui-overlay">
+        <div id="instruction-box">
+            <p id="instruction-text">✨ Tap layar untuk menumbuhkan Dandelion ✨</p>
+            <div class="progress-bar">
+                <div id="growth-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teks Kata-kata Kehidupan di Akhir Animasi -->
+    <div id="quote-container" class="hidden">
+        <div class="glowing-card">
+            <h2 class="quote-title">Filosofi Dandelion</h2>
+            <p class="quote-text">
+                "Seperti dandelion yang sabar menunggu angin datang, hidup mengajarkan kita bahwa melepaskan bukanlah akhir—melainkan cara semesta menerbangkan harapan kita untuk tumbuh di tempat yang baru dan lebih indah."
+            </p>
+            <button id="replay-btn" class="glow-button">Ulangi Harapan ✨</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
