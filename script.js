@@ -1,812 +1,628 @@
-// ============================================================================
-// 1. INISIALISASI SCENE, KAMERA & PENCAHAYAAN CERAH
-// ============================================================================
+// ==========================================
+// 1. INISIALISASI SCENE, KAMERA & RENDERER 3D
+// ==========================================
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0xcbe8ff, 0.016);
+scene.background = new THREE.Color(0x9be1fb);
+scene.fog = new THREE.FogExp2(0xd8f3ff, 0.032);
 
-const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 120);
-camera.position.set(0.05, 1.55, 5.2);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0.3, 2.3, 6.2);
+camera.lookAt(0.1, 1.15, 0);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
 container.appendChild(renderer.domElement);
 
-// Pencahayaan cerah merata
-scene.add(new THREE.HemisphereLight(0xffffff, 0xd8c7a8, 1.55));
+// ==========================================
+// 2. PENCAHAYAAN TAMAN HANGAT
+// ==========================================
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8bc34a, 0.85);
+scene.add(hemiLight);
 
-const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.65);
-sunLight.position.set(-4, 7.5, 5);
+const sunLight = new THREE.DirectionalLight(0xfff5d6, 1.15);
+sunLight.position.set(5, 8, 5);
 sunLight.castShadow = true;
 sunLight.shadow.mapSize.width = 1024;
 sunLight.shadow.mapSize.height = 1024;
-sunLight.shadow.bias = -0.0005;
 scene.add(sunLight);
 
-const fillLight = new THREE.DirectionalLight(0xbfdbfe, 0.9);
-fillLight.position.set(4, 3.5, 3);
-scene.add(fillLight);
+// ==========================================
+// 3. LINGKUNGAN TAMAN (LANTAI BATU, PAGAR & PENYIRAM)
+// ==========================================
+// Lantai halaman
+const groundGeo = new THREE.PlaneGeometry(30, 30);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0xd7ccc8, roughness: 0.9 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
 
-const dandelionGlow = new THREE.PointLight(0xfef08a, 1.5, 5);
-dandelionGlow.position.set(0.65, 1.15, 0.35);
-scene.add(dandelionGlow);
+// Rumput hijau di belakang
+const grassGeo = new THREE.PlaneGeometry(30, 15);
+const grassMat = new THREE.MeshStandardMaterial({ color: 0x7cb342, roughness: 0.85 });
+const grass = new THREE.Mesh(grassGeo, grassMat);
+grass.rotation.x = -Math.PI / 2;
+grass.position.set(0, 0.01, -6.5);
+scene.add(grass);
 
-// Lantai taman
-const groundMesh = new THREE.Mesh(
-    new THREE.CircleGeometry(8, 48),
-    new THREE.MeshStandardMaterial({ color: 0xe7dcc7, roughness: 0.85 })
-);
-groundMesh.rotation.x = -Math.PI / 2;
-groundMesh.position.y = -0.02;
-groundMesh.receiveShadow = true;
-scene.add(groundMesh);
+// Pagar kayu di latar belakang
+const fenceGroup = new THREE.Group();
+const woodMat = new THREE.MeshStandardMaterial({ color: 0xbcaaa4, roughness: 0.8 });
+for (let i = -8; i <= 8; i++) {
+  const plank = new THREE.Mesh(new THREE.BoxGeometry(0.65, 2.6, 0.12), woodMat);
+  plank.position.set(i * 0.72, 1.3, -3.5);
+  plank.castShadow = true;
+  plank.receiveShadow = true;
+  fenceGroup.add(plank);
+}
+const railTop = new THREE.Mesh(new THREE.BoxGeometry(13, 0.18, 0.14), woodMat);
+railTop.position.set(0, 2.0, -3.45);
+const railBot = new THREE.Mesh(new THREE.BoxGeometry(13, 0.18, 0.14), woodMat);
+railBot.position.set(0, 0.7, -3.45);
+fenceGroup.add(railTop, railBot);
+scene.add(fenceGroup);
 
-// ============================================================================
-// 2. KARAKTER ANAK KECIL DUDUK BERSILA & MENOPANG DAGU (TANPA GAMBAR EKSTERNAL)
-// ============================================================================
-const childRoot = new THREE.Group();
-childRoot.position.set(-0.78, 0.0, 0.15);
-childRoot.rotation.y = 0.42;
-scene.add(childRoot);
+// Gembor penyiram tanaman biru keabuan di kiri belakang
+const canGroup = new THREE.Group();
+const canMat = new THREE.MeshStandardMaterial({ color: 0x90a4ae, metalness: 0.3, roughness: 0.5 });
+const canBody = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 0.85, 20), canMat);
+canBody.position.y = 0.425;
+canBody.castShadow = true;
+const canSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.09, 0.75, 12), canMat);
+canSpout.position.set(0.4, 0.55, 0);
+canSpout.rotation.z = -Math.PI / 4;
+canGroup.add(canBody, canSpout);
+canGroup.position.set(-2.5, 0, -1.6);
+canGroup.rotation.y = 0.4;
+scene.add(canGroup);
 
-const skinMat = new THREE.MeshStandardMaterial({ color: 0xffd7be, roughness: 0.5 });
-const cheekMat = new THREE.MeshBasicMaterial({ color: 0xf9a8d4, transparent: true, opacity: 0.45 });
-const hoodieMat = new THREE.MeshStandardMaterial({ color: 0xf4ece1, roughness: 0.78 });
-const hoodieShadeMat = new THREE.MeshStandardMaterial({ color: 0xe2d5c3, roughness: 0.82 });
-const jeansMat = new THREE.MeshStandardMaterial({ color: 0x2b5b9e, roughness: 0.75 });
-const cuffMat = new THREE.MeshStandardMaterial({ color: 0x6b9ac4, roughness: 0.75 });
-const shoeRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.45 });
-const shoeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.45 });
-const hairMat = new THREE.MeshStandardMaterial({ color: 0x5c3821, roughness: 0.65 });
+// ==========================================
+// 4. KARAKTER ANAK KECIL 3D (CHIBI SESUAI REFERENSI)
+// ==========================================
+const childGroup = new THREE.Group();
 
-const bodyPivot = new THREE.Group();
-bodyPivot.position.set(0, 0.36, 0);
-childRoot.add(bodyPivot);
+// Material karakter
+const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdfc4, roughness: 0.6 });
+const hoodieMat = new THREE.MeshStandardMaterial({ color: 0xf3e5d8, roughness: 0.85 });
+const jeansMat = new THREE.MeshStandardMaterial({ color: 0x3b6998, roughness: 0.8 });
+const hairMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.75 });
+const shoeRedMat = new THREE.MeshStandardMaterial({ color: 0xd32f2f, roughness: 0.5 });
+const shoeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+const eyeMat = new THREE.MeshStandardMaterial({ color: 0x2b1b12, roughness: 0.2 });
 
-const torso = new THREE.Mesh(new THREE.SphereGeometry(0.28, 28, 28), hoodieMat);
-torso.scale.set(1.15, 1.18, 0.98);
+// Kaki bersila (Jeans biru)
+const legLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.22, 0.85, 16), jeansMat);
+legLeft.rotation.set(Math.PI / 2, 0, -0.5);
+legLeft.position.set(0.15, 0.22, 0.35);
+legLeft.castShadow = true;
+
+const legRight = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.22, 0.85, 16), jeansMat);
+legRight.rotation.set(Math.PI / 2, 0, 0.45);
+legRight.position.set(0.05, 0.2, -0.25);
+legRight.castShadow = true;
+
+// Sepatu sneakers merah-putih
+function createShoe() {
+  const shoe = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.2, 0.24), shoeRedMat);
+  body.position.y = 0.12;
+  const sole = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.06, 0.26), shoeWhiteMat);
+  sole.position.y = 0.03;
+  const toe = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), shoeWhiteMat);
+  toe.position.set(0.18, 0.1, 0);
+  shoe.add(body, sole, toe);
+  return shoe;
+}
+const shoe1 = createShoe();
+shoe1.position.set(0.42, 0.02, 0.15);
+shoe1.rotation.y = -0.3;
+const shoe2 = createShoe();
+shoe2.position.set(0.25, 0.02, -0.35);
+shoe2.rotation.y = 0.5;
+
+// Badan (Hoodie krem)
+const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.44, 0.85, 20), hoodieMat);
+torso.position.set(-0.08, 0.65, 0);
+torso.rotation.z = -0.22; // Sedikit membungkuk ke depan menatap pot
 torso.castShadow = true;
-bodyPivot.add(torso);
 
-const hood = new THREE.Mesh(new THREE.SphereGeometry(0.24, 24, 20), hoodieShadeMat);
-hood.scale.set(1.1, 0.9, 0.85);
-hood.position.set(0, 0.24, -0.18);
-hood.castShadow = true;
-bodyPivot.add(hood);
+// Tudung hoodie di belakang
+const hood = new THREE.Mesh(new THREE.SphereGeometry(0.36, 16, 16), hoodieMat);
+hood.position.set(-0.38, 0.92, 0);
+hood.scale.set(1.1, 0.8, 1.15);
 
-// Kaki duduk bersila + kasut merah putih
-function createCrossedLeg(side) {
-    const legGroup = new THREE.Group();
-    legGroup.position.set(side * 0.14, -0.22, 0.18);
-    legGroup.rotation.y = side * -0.35;
+// Lengan menopang dagu
+const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 0.55, 14), hoodieMat);
+armL.position.set(0.28, 0.88, 0.25);
+armL.rotation.set(0.2, 0, -0.5);
 
-    const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.34, 16), jeansMat);
-    thigh.rotation.z = Math.PI / 2;
-    thigh.position.set(side * 0.12, 0, 0.08);
-    thigh.castShadow = true;
+const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 0.55, 14), hoodieMat);
+armR.position.set(0.28, 0.88, -0.25);
+armR.rotation.set(-0.2, 0, -0.5);
 
-    const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.116, 0.116, 0.07, 16), cuffMat);
-    cuff.rotation.z = Math.PI / 2;
-    cuff.position.set(side * 0.26, 0, 0.08);
+// Tangan menopang pipi
+const handL = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 14), skinMat);
+handL.position.set(0.38, 1.12, 0.24);
+const handR = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 14), skinMat);
+handR.position.set(0.38, 1.12, -0.24);
 
-    const shoeGroup = new THREE.Group();
-    shoeGroup.position.set(side * 0.34, -0.02, 0.12);
-    shoeGroup.rotation.y = side * -0.25;
+// Grup Kepala Chibi
+const headGroup = new THREE.Group();
+headGroup.position.set(0.16, 1.48, 0);
+headGroup.rotation.z = -0.22; // Menunduk menatap tunas di pot
 
-    const shoeUpper = new THREE.Mesh(new THREE.SphereGeometry(0.11, 18, 18), shoeRedMat);
-    shoeUpper.scale.set(1.35, 0.85, 0.95);
-    shoeUpper.castShadow = true;
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.56, 28, 28), skinMat);
+head.castShadow = true;
+headGroup.add(head);
 
-    const shoeSole = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.045, 0.21), shoeWhiteMat);
-    shoeSole.position.y = -0.075;
+// Pipi merona
+const blushMat = new THREE.MeshBasicMaterial({ color: 0xff8a80, transparent: true, opacity: 0.45 });
+const blushL = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), blushMat);
+blushL.position.set(0.49, -0.1, 0.26);
+blushL.scale.set(0.4, 0.7, 1.1);
+const blushR = blushL.clone();
+blushR.position.z = -0.26;
+headGroup.add(blushL, blushR);
 
-    const shoeToe = new THREE.Mesh(new THREE.SphereGeometry(0.085, 14, 14), shoeWhiteMat);
-    shoeToe.scale.set(1.1, 0.75, 0.95);
-    shoeToe.position.set(side * 0.06, -0.02, 0);
-
-    shoeGroup.add(shoeUpper, shoeSole, shoeToe);
-    legGroup.add(thigh, cuff, shoeGroup);
-    return legGroup;
+// Mata besar berbinar
+function createEye() {
+  const eyeG = new THREE.Group();
+  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 16), eyeMat);
+  const shine = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 10), shoeWhiteMat);
+  shine.position.set(0.08, 0.04, 0.03);
+  eyeG.add(pupil, shine);
+  return eyeG;
 }
+const eyeL = createEye();
+eyeL.position.set(0.48, -0.02, 0.2);
+const eyeR = createEye();
+eyeR.position.set(0.48, -0.02, -0.2);
+headGroup.add(eyeL, eyeR);
 
-bodyPivot.add(createCrossedLeg(-1), createCrossedLeg(1));
+// Rambut coklat bergaya anime/chibi
+const hairBase = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 24), hairMat);
+hairBase.position.set(-0.06, 0.1, 0);
+headGroup.add(hairBase);
 
-// Kedua tangan menopang dagu
-function createChinArm(side) {
-    const armGroup = new THREE.Group();
-    armGroup.position.set(side * 0.27, 0.08, 0.04);
-
-    const sleeve = new THREE.Mesh(new THREE.SphereGeometry(0.095, 18, 18), hoodieMat);
-    sleeve.scale.set(0.85, 1.55, 0.85);
-    sleeve.position.set(side * 0.05, 0.08, 0.12);
-    sleeve.rotation.x = -0.65;
-    sleeve.rotation.z = side * -0.25;
-    sleeve.castShadow = true;
-
-    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.078, 16, 16), skinMat);
-    hand.scale.set(0.9, 1.15, 0.85);
-    hand.position.set(side * 0.11, 0.25, 0.24);
-
-    armGroup.add(sleeve, hand);
-    return armGroup;
-}
-
-bodyPivot.add(createChinArm(-1), createChinArm(1));
-
-// Kepala & ekspresi anak kecil
-const headPivot = new THREE.Group();
-headPivot.position.set(0, 0.34, 0.06);
-headPivot.rotation.x = 0.22;
-bodyPivot.add(headPivot);
-
-const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.32, 36, 36), skinMat);
-headMesh.scale.set(1.06, 1.0, 1.02);
-headMesh.position.y = 0.22;
-headMesh.castShadow = true;
-headPivot.add(headMesh);
-
-const cheekGeo = new THREE.SphereGeometry(0.065, 16, 16);
-cheekGeo.scale(1.1, 0.75, 0.4);
-const cheekL = new THREE.Mesh(cheekGeo, cheekMat);
-cheekL.position.set(-0.17, 0.16, 0.28);
-const cheekR = new THREE.Mesh(cheekGeo, cheekMat);
-cheekR.position.set(0.17, 0.16, 0.28);
-headPivot.add(cheekL, cheekR);
-
-const nose = new THREE.Mesh(new THREE.SphereGeometry(0.028, 12, 12), skinMat);
-nose.position.set(0, 0.19, 0.32);
-headPivot.add(nose);
-
-const smile = new THREE.Mesh(
-    new THREE.TorusGeometry(0.036, 0.008, 10, 20, Math.PI),
-    new THREE.MeshBasicMaterial({ color: 0x9a3412 })
-);
-smile.position.set(0, 0.15, 0.305);
-smile.rotation.x = Math.PI;
-headPivot.add(smile);
-
-function createEye(side) {
-    const eyeGroup = new THREE.Group();
-    eyeGroup.position.set(side * 0.115, 0.22, 0.285);
-    eyeGroup.rotation.y = side * 0.18;
-
-    const white = new THREE.Mesh(new THREE.SphereGeometry(0.062, 20, 20), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    white.scale.set(0.95, 1.15, 0.55);
-
-    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.048, 20, 20), new THREE.MeshBasicMaterial({ color: 0x3b2314 }));
-    iris.scale.set(0.95, 1.15, 0.5);
-    iris.position.z = 0.018;
-
-    const glint = new THREE.Mesh(new THREE.SphereGeometry(0.016, 10, 10), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    glint.position.set(-0.015, 0.018, 0.04);
-
-    eyeGroup.add(white, iris, glint);
-    return eyeGroup;
-}
-
-const eyeL = createEye(-1);
-const eyeR = createEye(1);
-headPivot.add(eyeL, eyeR);
-
-// Rambut berlapis procedural
-const hairGroup = new THREE.Group();
-hairGroup.position.set(0, 0.24, -0.01);
-headPivot.add(hairGroup);
-
-const hairCrown = new THREE.Mesh(
-    new THREE.SphereGeometry(0.335, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.68),
-    hairMat
-);
-hairCrown.rotation.x = -0.22;
-hairCrown.castShadow = true;
-hairGroup.add(hairCrown);
-
+// Helaian rambut poni & atas
 for (let i = 0; i < 14; i++) {
-    const angle = (i / 14) * Math.PI * 2;
-    const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.22, 10), hairMat);
-    tuft.position.set(Math.cos(angle) * 0.24, 0.08 + (i % 2) * 0.05, Math.sin(angle) * 0.22);
-    tuft.rotation.z = -Math.cos(angle) * 0.55;
-    tuft.rotation.x = Math.sin(angle) * 0.55;
-    tuft.castShadow = true;
-    hairGroup.add(tuft);
+  const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.42, 10), hairMat);
+  const angle = (i / 14) * Math.PI * 2;
+  tuft.position.set(Math.cos(angle) * 0.42, 0.35 + Math.sin(i) * 0.08, Math.sin(angle) * 0.42);
+  tuft.rotation.set(Math.sin(angle) * 0.6, 0, -Math.cos(angle) * 0.7);
+  headGroup.add(tuft);
 }
 
-// ============================================================================
-// 3. PASU TERAKOTA BERCORAK DANDELION (CANVAS TEXTURE INTERNAL)
-// ============================================================================
+childGroup.add(legLeft, legRight, shoe1, shoe2, torso, hood, armL, armR, handL, handR, headGroup);
+childGroup.position.set(-0.95, 0, 0.1);
+childGroup.rotation.y = -0.15;
+scene.add(childGroup);
+
+// ==========================================
+// 5. POT TERAKOTA & BUNGA DANDELION 3D
+// ==========================================
 const potGroup = new THREE.Group();
-potGroup.position.set(0.65, 0.0, 0.22);
+const terracottaMat = new THREE.MeshStandardMaterial({ color: 0xc8643b, roughness: 0.75 });
+const soilMat = new THREE.MeshStandardMaterial({ color: 0x4e342e, roughness: 1.0 });
+
+// Badan pot
+const potBody = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.35, 0.68, 24), terracottaMat);
+potBody.position.y = 0.34;
+potBody.castShadow = true;
+potBody.receiveShadow = true;
+
+// Bibir pot atas
+const potRim = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.48, 0.12, 24), terracottaMat);
+potRim.position.y = 0.68;
+potRim.castShadow = true;
+
+// Tanah dalam pot
+const soil = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.08, 20), soilMat);
+soil.position.y = 0.66;
+
+potGroup.add(potBody, potRim, soil);
+potGroup.position.set(0.85, 0, 0.25);
 scene.add(potGroup);
 
-const potCanvas = document.createElement('canvas');
-potCanvas.width = 512;
-potCanvas.height = 512;
-const pCtx = potCanvas.getContext('2d');
-pCtx.fillStyle = '#cf6d46';
-pCtx.fillRect(0, 0, 512, 512);
+// Grup Tanaman Dandelion yang Tumbuh
+const plantGroup = new THREE.Group();
+plantGroup.position.set(0.85, 0.68, 0.25);
+scene.add(plantGroup);
 
-pCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-pCtx.lineWidth = 3;
-pCtx.beginPath();
-pCtx.moveTo(256, 470);
-pCtx.quadraticCurveTo(245, 340, 260, 240);
-pCtx.stroke();
+// Batang hijau
+const stemMat = new THREE.MeshStandardMaterial({ color: 0x689f38, roughness: 0.6 });
+const stemGeo = new THREE.CylinderGeometry(0.025, 0.035, 1, 12);
+stemGeo.translate(0, 0.5, 0); // Pivot di bawah agar mudah di-scale
+const stem = new THREE.Mesh(stemGeo, stemMat);
+stem.scale.set(1, 0.15, 1);
+plantGroup.add(stem);
 
-pCtx.lineWidth = 1.5;
-for (let a = 0; a < Math.PI * 2; a += Math.PI / 18) {
-    const x2 = 260 + Math.cos(a) * 58;
-    const y2 = 240 + Math.sin(a) * 58;
-    pCtx.beginPath();
-    pCtx.moveTo(260, 240);
-    pCtx.lineTo(x2, y2);
-    pCtx.stroke();
-}
-
-const potPoints = [
-    new THREE.Vector2(0.0, 0.0),
-    new THREE.Vector2(0.25, 0.0),
-    new THREE.Vector2(0.34, 0.42),
-    new THREE.Vector2(0.38, 0.44),
-    new THREE.Vector2(0.38, 0.52),
-    new THREE.Vector2(0.31, 0.52),
-    new THREE.Vector2(0.29, 0.45)
-];
-const potMesh = new THREE.Mesh(
-    new THREE.LatheGeometry(potPoints, 36),
-    new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(potCanvas), roughness: 0.68 })
-);
-potMesh.castShadow = true;
-potMesh.receiveShadow = true;
-potGroup.add(potMesh);
-
-const soil = new THREE.Mesh(
-    new THREE.SphereGeometry(0.305, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.5),
-    new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.92 })
-);
-soil.scale.y = 0.2;
-soil.position.y = 0.45;
-potGroup.add(soil);
-
-// ============================================================================
-// 4. SIKLUS BUNGA DANDELION: BIJI -> TUNAS/BUNGA SEGAR -> KAPAS TERBANG
-// ============================================================================
-const seedBean = new THREE.Mesh(
-    new THREE.SphereGeometry(0.055, 16, 16),
-    new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.5 })
-);
-seedBean.scale.set(1.2, 0.7, 0.9);
-seedBean.position.set(0.65, 0.48, 0.22);
-scene.add(seedBean);
-
-const leavesGroup = new THREE.Group();
-leavesGroup.position.set(0.65, 0.46, 0.22);
-scene.add(leavesGroup);
-
-const leafMat = new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 0.55, side: THREE.DoubleSide });
+// Daun dasar
+const leafMat = new THREE.MeshStandardMaterial({ color: 0x7cb342, side: THREE.DoubleSide });
 const leaves = [];
-for (let i = 0; i < 6; i++) {
-    const leaf = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.26, 5), leafMat);
-    leaf.geometry.translate(0, 0.13, 0);
-    leaf.rotation.y = (i / 6) * Math.PI * 2;
-    leaf.rotation.x = 1.0;
-    leaf.scale.set(0.01, 0.01, 0.01);
-    leavesGroup.add(leaf);
-    leaves.push(leaf);
+for (let i = 0; i < 4; i++) {
+  const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 8), leafMat);
+  leaf.scale.set(1.8, 0.15, 0.6);
+  const ang = (i * Math.PI) / 2 + 0.4;
+  leaf.position.set(Math.cos(ang) * 0.14, 0.05, Math.sin(ang) * 0.14);
+  leaf.rotation.y = -ang;
+  leaf.rotation.z = 0.3;
+  plantGroup.add(leaf);
+  leaves.push(leaf);
 }
 
-const dandelionGroup = new THREE.Group();
-dandelionGroup.position.set(0.65, 0.46, 0.22);
-scene.add(dandelionGroup);
-
-const stemGeo = new THREE.CylinderGeometry(0.015, 0.026, 1, 14);
-stemGeo.translate(0, 0.5, 0);
-const stem = new THREE.Mesh(stemGeo, new THREE.MeshStandardMaterial({ color: 0x65a30d, roughness: 0.5 }));
-stem.scale.set(1, 0.01, 1);
-stem.castShadow = true;
-dandelionGroup.add(stem);
-
+// Kepala Bunga Dandelion (Tahap 1: Kuncup/Kuning -> Tahap 2: Bola Kapas Putih)
 const flowerHead = new THREE.Group();
-flowerHead.position.y = 0.01;
-dandelionGroup.add(flowerHead);
+flowerHead.position.y = 0.15;
+plantGroup.add(flowerHead);
 
-const yellowPetalsGroup = new THREE.Group();
-flowerHead.add(yellowPetalsGroup);
-
-const yellowPetalMat = new THREE.MeshStandardMaterial({
-    color: 0xfacc15,
-    emissive: 0xeab308,
-    emissiveIntensity: 0.35,
-    roughness: 0.45,
-    side: THREE.DoubleSide
-});
-
-const yellowPetals = [];
-for (let i = 0; i < 36; i++) {
-    const ring = i < 18 ? 0 : 1;
-    const idx = i % 18;
-    const angle = (idx / 18) * Math.PI * 2 + ring * 0.18;
-    const petal = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.22, 5), yellowPetalMat);
-    petal.geometry.translate(0, 0.11, 0);
-    petal.rotation.y = angle;
-    petal.rotation.x = ring === 0 ? 0.55 : 0.95;
-    petal.scale.set(0.01, 0.01, 0.01);
-    yellowPetalsGroup.add(petal);
-    yellowPetals.push({ mesh: petal, baseRotX: ring === 0 ? 0.55 : 0.95 });
-}
-
-const puffCore = new THREE.Mesh(
-    new THREE.SphereGeometry(0.05, 16, 16),
-    new THREE.MeshStandardMaterial({ color: 0xfef08a })
+// Kelopak kuning (saat masih muda)
+const yellowFlower = new THREE.Mesh(
+  new THREE.SphereGeometry(0.14, 16, 16),
+  new THREE.MeshStandardMaterial({ color: 0xffd54f, emissive: 0xffb300, emissiveIntensity: 0.2 })
 );
-flowerHead.add(puffCore);
+yellowFlower.scale.set(1.2, 0.6, 1.2);
+yellowFlower.visible = false;
+flowerHead.add(yellowFlower);
+
+// Benih-benih kapas putih (Dandelion Puff)
+const puffGroup = new THREE.Group();
+puffGroup.visible = false;
+flowerHead.add(puffGroup);
 
 const seeds = [];
-const seedCount = 96;
-const stalkMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.88 });
-const fluffMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.96 });
+const seedCount = 90;
+const seedMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.92 });
 
 for (let i = 0; i < seedCount; i++) {
-    const seedObj = new THREE.Group();
-    const phi = Math.acos(-1 + (2 * i) / seedCount);
-    const theta = Math.sqrt(seedCount * Math.PI) * phi;
-    const dir = new THREE.Vector3(
-        Math.cos(theta) * Math.sin(phi),
-        Math.sin(theta) * Math.sin(phi),
-        Math.cos(phi)
-    );
+  // Distribusi bola Fibonacci agar merata
+  const phi = Math.acos(1 - (2 * (i + 0.5)) / seedCount);
+  const theta = Math.PI * (1 + Math.sqrt(5)) * i;
 
-    const stalkGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.24, 4);
-    stalkGeo.translate(0, 0.12, 0);
-    const stalk = new THREE.Mesh(stalkGeo, stalkMat);
+  const dir = new THREE.Vector3(
+    Math.sin(phi) * Math.cos(theta),
+    Math.cos(phi),
+    Math.sin(phi) * Math.sin(theta)
+  );
 
-    const fluff = new THREE.Mesh(new THREE.IcosahedronGeometry(0.03, 0), fluffMat);
-    fluff.position.y = 0.24;
+  const seedUnit = new THREE.Group();
+  // Tangkai benih halus
+  const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.22, 5), seedMat);
+  stalk.position.y = 0.11;
+  // Bulu payung benih
+  const fluff = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.05, 7, 1, true), seedMat);
+  fluff.position.y = 0.22;
+  fluff.rotation.x = Math.PI;
 
-    seedObj.add(stalk, fluff);
-    seedObj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
-    seedObj.scale.set(0.01, 0.01, 0.01);
-    flowerHead.add(seedObj);
+  seedUnit.add(stalk, fluff);
+  seedUnit.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
 
-    seeds.push({
-        mesh: seedObj,
-        isFlying: false,
-        releaseTime: 0.3 + (i / seedCount) * 2.2,
-        velocity: new THREE.Vector3(
-            0.016 + Math.random() * 0.02,
-            0.012 + Math.random() * 0.016,
-            (Math.random() - 0.5) * 0.018
-        ),
-        spin: new THREE.Vector3(
-            (Math.random() - 0.5) * 0.035,
-            (Math.random() - 0.5) * 0.035,
-            (Math.random() - 0.5) * 0.035
-        )
-    });
+  puffGroup.add(seedUnit);
+  seeds.push({
+    mesh: seedUnit,
+    flying: false,
+    velocity: new THREE.Vector3(),
+    rotSpeed: new THREE.Vector3(
+      (Math.random() - 0.5) * 0.05,
+      (Math.random() - 0.5) * 0.05,
+      (Math.random() - 0.5) * 0.05
+    ),
+    delay: Math.random() * 1.5
+  });
 }
 
-// ============================================================================
-// 5. PERCIKAN CAHAYA KEEMASAN
-// ============================================================================
-const sparkleCount = 220;
+// ==========================================
+// 6. PERCIKAN CAHAYA & EFEK ANGIN
+// ==========================================
+// Partikel percikan cahaya (Sparkles)
+const sparkleCount = 160;
 const sparkleGeo = new THREE.BufferGeometry();
 const sparklePos = new Float32Array(sparkleCount * 3);
-const sparkleSpeeds = [];
+const sparkleVel = [];
 
 for (let i = 0; i < sparkleCount; i++) {
-    sparklePos[i * 3] = (Math.random() - 0.5) * 12;
-    sparklePos[i * 3 + 1] = Math.random() * 6;
-    sparklePos[i * 3 + 2] = (Math.random() - 0.5) * 8;
-    sparkleSpeeds.push(0.005 + Math.random() * 0.012);
+  sparklePos[i * 3] = (Math.random() - 0.5) * 10;
+  sparklePos[i * 3 + 1] = Math.random() * 6;
+  sparklePos[i * 3 + 2] = (Math.random() - 0.5) * 8;
+  sparkleVel.push({
+    y: 0.005 + Math.random() * 0.012,
+    x: (Math.random() - 0.5) * 0.008
+  });
 }
 sparkleGeo.setAttribute('position', new THREE.BufferAttribute(sparklePos, 3));
 
-const canvasSprite = document.createElement('canvas');
-canvasSprite.width = 64;
-canvasSprite.height = 64;
-const sCtx = canvasSprite.getContext('2d');
-const sGrad = sCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
-sGrad.addColorStop(0, 'rgba(255, 255, 240, 1)');
-sGrad.addColorStop(0.4, 'rgba(254, 240, 138, 0.85)');
-sGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
-sCtx.fillStyle = sGrad;
-sCtx.fillRect(0, 0, 64, 64);
-
-const sparkles = new THREE.Points(
-    sparkleGeo,
-    new THREE.PointsMaterial({
-        size: 0.17,
-        map: new THREE.CanvasTexture(canvasSprite),
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-    })
-);
+const sparkleMat = new THREE.PointsMaterial({
+  color: 0xfff59d,
+  size: 0.11,
+  transparent: true,
+  opacity: 0.0,
+  blending: THREE.AdditiveBlending
+});
+const sparkles = new THREE.Points(sparkleGeo, sparkleMat);
 scene.add(sparkles);
 
-// ============================================================================
-// 6. MELODI & LIRIK "DANDELIONS" (SINTETIS + OPSIONAL MP3 LOKAL)
-// ============================================================================
-const bgMusic = document.getElementById('bg-music');
-const musicToggle = document.getElementById('music-toggle');
-const lyricBox = document.getElementById('lyric-box');
-const lyricLine = document.getElementById('lyric-line');
-
-let audioCtx = null;
-let sequenceTimer = null;
-let isMusicPlaying = false;
-let usingMp3 = false;
-
-const dandelionSections = [
-    {
-        lyric: "'Cause I'm in a field of dandelions",
-        notes: [
-            { f: 349.23, d: 340 }, { f: 392.00, d: 340 }, { f: 440.00, d: 340 },
-            { f: 440.00, d: 340 }, { f: 523.25, d: 420 }, { f: 493.88, d: 340 },
-            { f: 440.00, d: 360 }, { f: 392.00, d: 360 }, { f: 349.23, d: 720 }
-        ]
-    },
-    {
-        lyric: "Wishing on every one that you'd be mine, mine",
-        notes: [
-            { f: 440.00, d: 340 }, { f: 440.00, d: 340 }, { f: 392.00, d: 320 },
-            { f: 440.00, d: 320 }, { f: 523.25, d: 320 }, { f: 587.33, d: 420 },
-            { f: 523.25, d: 320 }, { f: 440.00, d: 340 }, { f: 392.00, d: 340 },
-            { f: 523.25, d: 520 }, { f: 440.00, d: 760 }
-        ]
-    },
-    {
-        lyric: "And I see forever in your eyes",
-        notes: [
-            { f: 349.23, d: 320 }, { f: 392.00, d: 320 }, { f: 440.00, d: 380 },
-            { f: 523.25, d: 360 }, { f: 587.33, d: 360 }, { f: 523.25, d: 420 },
-            { f: 440.00, d: 360 }, { f: 392.00, d: 420 }, { f: 440.00, d: 780 }
-        ]
-    },
-    {
-        lyric: "I feel okay when I see you smile, smile",
-        notes: [
-            { f: 440.00, d: 340 }, { f: 493.88, d: 340 }, { f: 523.25, d: 420 },
-            { f: 587.33, d: 450 }, { f: 523.25, d: 320 }, { f: 493.88, d: 320 },
-            { f: 440.00, d: 360 }, { f: 392.00, d: 360 }, { f: 440.00, d: 520 },
-            { f: 349.23, d: 780 }
-        ]
-    },
-    {
-        lyric: "Wishing on dandelions all of the time",
-        notes: [
-            { f: 440.00, d: 340 }, { f: 440.00, d: 340 }, { f: 392.00, d: 320 },
-            { f: 440.00, d: 360 }, { f: 523.25, d: 360 }, { f: 587.33, d: 420 },
-            { f: 523.25, d: 340 }, { f: 440.00, d: 340 }, { f: 392.00, d: 340 },
-            { f: 440.00, d: 760 }
-        ]
-    },
-    {
-        lyric: "Praying to God that one day you'll be mine",
-        notes: [
-            { f: 440.00, d: 340 }, { f: 493.88, d: 340 }, { f: 523.25, d: 340 },
-            { f: 587.33, d: 450 }, { f: 523.25, d: 340 }, { f: 493.88, d: 360 },
-            { f: 440.00, d: 360 }, { f: 392.00, d: 360 }, { f: 440.00, d: 360 },
-            { f: 349.23, d: 780 }
-        ]
-    },
-    {
-        lyric: "Wishing on dandelions all of the time, all of the time",
-        notes: [
-            { f: 440.00, d: 340 }, { f: 440.00, d: 340 }, { f: 392.00, d: 320 },
-            { f: 440.00, d: 360 }, { f: 523.25, d: 360 }, { f: 587.33, d: 420 },
-            { f: 523.25, d: 340 }, { f: 440.00, d: 340 }, { f: 392.00, d: 340 },
-            { f: 440.00, d: 520 }, { f: 523.25, d: 340 }, { f: 493.88, d: 340 },
-            { f: 440.00, d: 340 }, { f: 349.23, d: 950 }
-        ]
-    }
-];
-
-function playTone(freq, durationMs) {
-    if (!audioCtx || audioCtx.state !== 'running') return;
-    const now = audioCtx.currentTime;
-    const durSec = durationMs / 1000;
-
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, now);
-
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
-    gain.gain.linearRampToValueAtTime(0.001, now + durSec + 0.12);
-
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(now);
-    osc.stop(now + durSec + 0.15);
+// Garis-garis angin visual
+const windLines = [];
+const windMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.0 });
+for (let i = 0; i < 12; i++) {
+  const line = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.015, 0.015), windMat);
+  line.position.set(-5 - Math.random() * 5, 0.8 + Math.random() * 2.5, (Math.random() - 0.5) * 3);
+  scene.add(line);
+  windLines.push(line);
 }
 
-function runLyricAndMelodyLoop() {
-    if (sequenceTimer) clearTimeout(sequenceTimer);
-    let secIdx = 0;
-    let noteIdx = 0;
-
-    const step = () => {
-        if (!isMusicPlaying) return;
-        const currentSection = dandelionSections[secIdx % dandelionSections.length];
-        if (noteIdx === 0 && lyricLine && lyricBox) {
-            lyricLine.textContent = currentSection.lyric;
-            lyricBox.classList.remove('lyric-hidden');
-            lyricBox.classList.add('lyric-visible');
-        }
-
-        const currentNote = currentSection.notes[noteIdx];
-        if (!usingMp3) playTone(currentNote.f, currentNote.d);
-
-        noteIdx++;
-        if (noteIdx >= currentSection.notes.length) {
-            noteIdx = 0;
-            secIdx++;
-            sequenceTimer = setTimeout(step, currentNote.d + 450);
-        } else {
-            sequenceTimer = setTimeout(step, currentNote.d + 40);
-        }
-    };
-    step();
-}
-
-function stopLyricAndMelodyLoop() {
-    if (sequenceTimer) {
-        clearTimeout(sequenceTimer);
-        sequenceTimer = null;
-    }
-    if (lyricBox) {
-        lyricBox.classList.remove('lyric-visible');
-        lyricBox.classList.add('lyric-hidden');
-    }
-}
-
-function unlockAndStartMusic() {
-    if (!audioCtx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) audioCtx = new AudioCtx();
-    }
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    if (isMusicPlaying) return;
-    isMusicPlaying = true;
-
-    if (bgMusic && bgMusic.getAttribute('src')) {
-        bgMusic.volume = 0.85;
-        const p = bgMusic.play();
-        if (p !== undefined) {
-            p.then(() => {
-                usingMp3 = true;
-                musicToggle.textContent = '🎵 Dandelions: ON';
-                runLyricAndMelodyLoop();
-            }).catch(() => {
-                usingMp3 = false;
-                musicToggle.textContent = '🎵 Melodi: ON';
-                runLyricAndMelodyLoop();
-            });
-            return;
-        }
-    }
-    usingMp3 = false;
-    musicToggle.textContent = '🎵 Melodi: ON';
-    runLyricAndMelodyLoop();
-}
-
-['touchstart', 'click', 'pointerdown'].forEach((evtName) => {
-    document.addEventListener(evtName, unlockAndStartMusic, { once: true, passive: true });
-});
-
-musicToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (!audioCtx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) audioCtx = new AudioCtx();
-    }
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-
-    if (!isMusicPlaying) {
-        isMusicPlaying = true;
-        if (usingMp3 && bgMusic) {
-            bgMusic.play().catch(() => { usingMp3 = false; });
-        }
-        musicToggle.textContent = usingMp3 ? '🎵 Dandelions: ON' : '🎵 Melodi: ON';
-        runLyricAndMelodyLoop();
-    } else {
-        isMusicPlaying = false;
-        if (bgMusic) bgMusic.pause();
-        stopLyricAndMelodyLoop();
-        musicToggle.textContent = '🎵 Musik: OFF';
-    }
-});
-
-// ============================================================================
-// 7. TAP LAYAR & LOOP ANIMASI 3D
-// ============================================================================
-let growthProgress = 0;
-let targetGrowth = 0;
-let windActive = false;
-let windTimer = 0;
-
-const growthFill = document.getElementById('growth-fill');
-const instructionText = document.getElementById('instruction-text');
-const uiOverlay = document.getElementById('ui-overlay');
-const quoteContainer = document.getElementById('quote-container');
-const replayBtn = document.getElementById('replay-btn');
-
-function updateStageText(val) {
-    if (val === 0) instructionText.textContent = "🌰 Tap layar — biji dandelion mulai bertunas...";
-    else if (val < 38) instructionText.textContent = "🌱 Biji bertunas menjadi batang & daun muda...";
-    else if (val < 72) instructionText.textContent = "🌼 Bunga dandelion kuning segar mulai mekar!";
-    else if (val < 100) instructionText.textContent = "☁️ Kapas putih siap terbang! Tap sekali lagi...";
-    else instructionText.textContent = "🌬️ Angin berhembus! Biji dandelion terbang...";
-}
-
-function handleTap() {
-    unlockAndStartMusic();
-    if (windActive) return;
-
-    targetGrowth = Math.min(100, targetGrowth + 15);
-    growthFill.style.width = `${targetGrowth}%`;
-    updateStageText(targetGrowth);
-
-    dandelionGlow.intensity = 3.5;
-    setTimeout(() => { dandelionGlow.intensity = 1.5; }, 200);
-
-    if (targetGrowth >= 100 && !windActive) {
-        setTimeout(() => {
-            windActive = true;
-            uiOverlay.style.opacity = '0';
-        }, 1100);
-    }
-}
-
-container.addEventListener('pointerdown', handleTap);
-
-replayBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    unlockAndStartMusic();
-    growthProgress = 0;
-    targetGrowth = 0;
-    windActive = false;
-    windTimer = 0;
-
-    growthFill.style.width = '0%';
-    updateStageText(0);
-    uiOverlay.style.opacity = '1';
-    quoteContainer.classList.remove('visible');
-
-    seedBean.scale.set(1.2, 0.7, 0.9);
-    stem.scale.set(1, 0.01, 1);
-    flowerHead.position.y = 0.01;
-    dandelionGroup.rotation.z = 0;
-
-    seeds.forEach((seed, i) => {
-        if (seed.mesh.parent !== flowerHead) {
-            scene.remove(seed.mesh);
-            flowerHead.add(seed.mesh);
-        }
-        const phi = Math.acos(-1 + (2 * i) / seedCount);
-        const theta = Math.sqrt(seedCount * Math.PI) * phi;
-        const dir = new THREE.Vector3(
-            Math.cos(theta) * Math.sin(phi),
-            Math.sin(theta) * Math.sin(phi),
-            Math.cos(phi)
-        );
-        seed.mesh.position.set(0, 0, 0);
-        seed.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
-        seed.mesh.scale.set(0.01, 0.01, 0.01);
-        seed.isFlying = false;
+// Tap burst particles (percikan tiap kali layar disentuh)
+const tapParticles = [];
+function spawnTapSparkle() {
+  for (let i = 0; i < 10; i++) {
+    const p = new THREE.Mesh(
+      new THREE.SphereGeometry(0.035, 8, 8),
+      new THREE.MeshBasicMaterial({ color: 0xfff176, transparent: true, opacity: 1 })
+    );
+    p.position.set(
+      0.85 + (Math.random() - 0.5) * 0.4,
+      0.85 + Math.random() * 0.4,
+      0.25 + (Math.random() - 0.5) * 0.4
+    );
+    scene.add(p);
+    tapParticles.push({
+      mesh: p,
+      vy: 0.02 + Math.random() * 0.03,
+      vx: (Math.random() - 0.5) * 0.03,
+      vz: (Math.random() - 0.5) * 0.03,
+      life: 1.0
     });
+  }
+}
+
+// ==========================================
+// 7. LOGIKA INTERAKSI TAP LAYAR & AUDIO
+// ==========================================
+let growth = 0; // 0 sampai 100
+let stage = 'growing'; // 'growing' | 'bloomed' | 'blowing' | 'ending'
+let blowTimer = 0;
+
+const progressBar = document.getElementById('progress-bar');
+const tapHint = document.getElementById('tap-hint');
+const uiContainer = document.getElementById('ui-container');
+const quoteOverlay = document.getElementById('quote-overlay');
+const btnReplay = document.getElementById('btn-replay');
+
+// Audio Setup
+const bgMusic = document.getElementById('bg-music');
+const btnAudio = document.getElementById('btn-audio');
+const uploadMp3 = document.getElementById('upload-mp3');
+let isPlaying = false;
+
+function tryPlayMusic() {
+  if (!isPlaying) {
+    bgMusic.play().then(() => {
+      isPlaying = true;
+      btnAudio.textContent = '🔊 Musik Aktif';
+    }).catch(() => {
+      // Browser memblokir autoplay sebelum ada file / interaksi valid
+    });
+  }
+}
+
+btnAudio.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (bgMusic.paused) {
+    bgMusic.play().then(() => {
+      isPlaying = true;
+      btnAudio.textContent = '🔊 Musik Aktif';
+    });
+  } else {
+    bgMusic.pause();
+    isPlaying = false;
+    btnAudio.textContent = '🔇 Musik Jeda';
+  }
 });
 
+uploadMp3.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const url = URL.createObjectURL(file);
+    bgMusic.src = url;
+    bgMusic.play().then(() => {
+      isPlaying = true;
+      btnAudio.textContent = '🔊 Dandelions';
+    });
+  }
+});
+
+// Event Tap Layar
+function handleScreenTap() {
+  tryPlayMusic();
+
+  if (stage !== 'growing') return;
+
+  growth = Math.min(100, growth + 10);
+  progressBar.style.width = growth + '%';
+  spawnTapSparkle();
+
+  // Anak kecil mengangguk senang saat bunga tumbuh
+  headGroup.rotation.z = -0.12;
+  setTimeout(() => {
+    if (stage === 'growing') headGroup.rotation.z = -0.22;
+  }, 180);
+
+  // Update visual tanaman berdasarkan progress
+  const stemHeight = 0.15 + (growth / 100) * 1.15;
+  stem.scale.y = stemHeight;
+  flowerHead.position.y = stemHeight;
+
+  if (growth >= 40 && growth < 80) {
+    yellowFlower.visible = true;
+    puffGroup.visible = false;
+    const s = 0.5 + ((growth - 40) / 40) * 0.7;
+    yellowFlower.scale.set(1.2 * s, 0.6 * s, 1.2 * s);
+    tapHint.textContent = '🌼 Bunga mulai mekar! Terus tap layar...';
+  } else if (growth >= 80 && growth < 100) {
+    yellowFlower.visible = false;
+    puffGroup.visible = true;
+    const s = 0.7 + ((growth - 80) / 20) * 0.35;
+    puffGroup.scale.set(s, s, s);
+    tapHint.textContent = '🤍 Sedikit lagi! Siap menyambut angin...';
+  } else if (growth >= 100) {
+    puffGroup.scale.set(1.05, 1.05, 1.05);
+    stage = 'blowing';
+    tapHint.textContent = '🍃 Angin berembus menerbangkan harapan...';
+    setTimeout(() => {
+      uiContainer.style.opacity = '0';
+    }, 1500);
+  }
+}
+
+container.addEventListener('pointerdown', handleScreenTap);
+
+// Tombol Ulangi dari Awal
+btnReplay.addEventListener('click', () => {
+  growth = 0;
+  stage = 'growing';
+  blowTimer = 0;
+  progressBar.style.width = '0%';
+  tapHint.textContent = '✨ Tap layar untuk menumbuhkan Dandelion ✨';
+  uiContainer.style.opacity = '1';
+  quoteOverlay.classList.remove('visible');
+
+  // Reset tanaman & benih
+  stem.scale.y = 0.15;
+  flowerHead.position.y = 0.15;
+  yellowFlower.visible = false;
+  puffGroup.visible = false;
+
+  seeds.forEach((s, i) => {
+    const phi = Math.acos(1 - (2 * (i + 0.5)) / seedCount);
+    const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+    const dir = new THREE.Vector3(
+      Math.sin(phi) * Math.cos(theta),
+      Math.cos(phi),
+      Math.sin(phi) * Math.sin(theta)
+    );
+    s.mesh.position.set(0, 0, 0);
+    s.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+    s.flying = false;
+  });
+
+  // Reset langit & kamera
+  scene.background.setHex(0x9be1fb);
+  scene.fog.color.setHex(0xd8f3ff);
+  sparkleMat.opacity = 0;
+  windMat.opacity = 0;
+  camera.position.set(0.3, 2.3, 6.2);
+});
+
+// ==========================================
+// 8. LOOP ANIMASI UTAMA (60 FPS)
+// ==========================================
 const clock = new THREE.Clock();
 
 function animate() {
-    requestAnimationFrame(animate);
-    const dt = clock.getDelta();
-    const t = clock.getElapsedTime();
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
 
-    // Gerakan anak kecil
-    bodyPivot.position.y = 0.36 + Math.abs(Math.sin(t * 2.2)) * 0.015;
-    headPivot.rotation.z = Math.sin(t * 1.3) * 0.08;
-    const lookPitch = windActive ? -0.32 : 0.22 - (growthProgress / 100) * 0.42;
-    headPivot.rotation.x += (lookPitch - headPivot.rotation.x) * 0.08;
+  // Animasi napas lembut anak kecil
+  childGroup.position.y = Math.sin(t * 2) * 0.015;
+  if (stage === 'growing') {
+    headGroup.rotation.y = Math.sin(t * 1.2) * 0.06;
+  }
 
-    // Transisi dandelion: biji -> bunga segar -> kapas siap terbang
-    growthProgress += (targetGrowth - growthProgress) * 0.08;
-    const p = growthProgress / 100;
+  // Goyang alami tanaman
+  plantGroup.rotation.z = Math.sin(t * 1.8) * 0.03;
 
-    const beanScale = Math.max(0.01, (1 - p * 3.2) * 1.1);
-    seedBean.scale.set(beanScale * 1.2, beanScale * 0.7, beanScale * 0.9);
+  // Update partikel percikan tap
+  for (let i = tapParticles.length - 1; i >= 0; i--) {
+    const p = tapParticles[i];
+    p.mesh.position.y += p.vy;
+    p.mesh.position.x += p.vx;
+    p.mesh.position.z += p.vz;
+    p.life -= 0.025;
+    p.mesh.material.opacity = Math.max(0, p.life);
+    if (p.life <= 0) {
+      scene.remove(p.mesh);
+      tapParticles.splice(i, 1);
+    }
+  }
 
-    const leafScale = Math.min(1, Math.max(0.01, p * 2.2));
-    leaves.forEach((leaf) => leaf.scale.set(leafScale, leafScale, leafScale * 0.35));
+  // Tahap Angin Meniup Bunga Dandelion
+  if (stage === 'blowing' || stage === 'ending') {
+    blowTimer += 0.016;
 
-    const stemHeight = 0.01 + p * 1.22;
-    stem.scale.y = stemHeight;
-    flowerHead.position.y = stemHeight;
+    // Anak mendongak mengikuti benih terbang ke langit
+    headGroup.rotation.z = THREE.MathUtils.lerp(headGroup.rotation.z, 0.25, 0.02);
 
-    const freshBloom = p < 0.75
-        ? Math.max(0.01, (p - 0.2) / 0.55)
-        : Math.max(0.01, 1 - (p - 0.75) / 0.25);
+    // Goyang tanaman lebih kuat tertiup angin
+    plantGroup.rotation.z = Math.sin(t * 5) * 0.12 - 0.1;
 
-    yellowPetals.forEach((item) => {
-        item.mesh.scale.set(freshBloom, freshBloom, freshBloom);
+    // Visual garis angin melintas
+    windMat.opacity = Math.min(0.45, blowTimer * 0.3);
+    windLines.forEach((line, idx) => {
+      line.position.x += 0.14 + idx * 0.005;
+      if (line.position.x > 6) line.position.x = -6;
     });
 
-    const puffReady = Math.max(0.01, (p - 0.62) / 0.38);
-    puffCore.scale.setScalar(puffReady);
-
-    seeds.forEach((seed) => {
-        if (!seed.isFlying) {
-            const tremble = p > 0.85 ? Math.sin(t * 22 + seed.releaseTime * 10) * 0.04 : 0;
-            const s = puffReady + tremble;
-            seed.mesh.scale.set(s, s, s);
+    // Terbangkan benih satu per satu secara alami
+    seeds.forEach((s) => {
+      if (blowTimer > s.delay) {
+        if (!s.flying) {
+          s.flying = true;
+          s.velocity.set(
+            0.035 + Math.random() * 0.03,
+            0.022 + Math.random() * 0.025,
+            (Math.random() - 0.5) * 0.03
+          );
         }
+        s.mesh.position.add(s.velocity);
+        s.mesh.position.y += Math.sin(t * 3 + s.delay) * 0.004;
+        s.mesh.rotation.x += s.rotSpeed.x;
+        s.mesh.rotation.y += s.rotSpeed.y;
+        s.mesh.rotation.z += s.rotSpeed.z;
+      }
     });
 
-    // Angin & biji terbang
-    if (windActive) {
-        windTimer += dt;
-        dandelionGroup.rotation.z = -Math.sin(t * 3) * 0.07 - 0.16;
+    // Transisi langit menjadi senja hangat & penuh percikan cahaya emas
+    if (blowTimer > 1.8) {
+      const targetSky = new THREE.Color(0x1e294b);
+      scene.background.lerp(targetSky, 0.012);
+      scene.fog.color.lerp(targetSky, 0.012);
+      sparkleMat.opacity = Math.min(0.95, (blowTimer - 1.8) * 0.35);
 
-        seeds.forEach((seed) => {
-            if (windTimer > seed.releaseTime) {
-                if (!seed.isFlying) {
-                    seed.isFlying = true;
-                    const worldPos = new THREE.Vector3();
-                    const worldQuat = new THREE.Quaternion();
-                    seed.mesh.getWorldPosition(worldPos);
-                    seed.mesh.getWorldQuaternion(worldQuat);
-
-                    flowerHead.remove(seed.mesh);
-                    scene.add(seed.mesh);
-                    seed.mesh.position.copy(worldPos);
-                    seed.mesh.quaternion.copy(worldQuat);
-                }
-
-                seed.mesh.position.x += seed.velocity.x;
-                seed.mesh.position.y += seed.velocity.y + Math.sin(t * 2.6 + seed.releaseTime) * 0.005;
-                seed.mesh.position.z += seed.velocity.z;
-
-                seed.mesh.rotation.x += seed.spin.x;
-                seed.mesh.rotation.y += seed.spin.y;
-                seed.mesh.rotation.z += seed.spin.z;
-            }
-        });
-
-        if (windTimer > 3.5 && !quoteContainer.classList.contains('visible')) {
-            quoteContainer.classList.add('visible');
-        }
-    } else {
-        dandelionGroup.rotation.z = Math.sin(t * 1.5) * 0.03;
+      // Kamera sedikit naik mengarah ke langit berbintang/bercahaya
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 2.75, 0.01);
+      camera.lookAt(0.2, 1.65, 0);
     }
 
-    // Percikan cahaya
-    const posArr = sparkles.geometry.attributes.position.array;
-    for (let i = 0; i < sparkleCount; i++) {
-        posArr[i * 3 + 1] += sparkleSpeeds[i];
-        posArr[i * 3] += Math.sin(t + i) * 0.003 + (windActive ? 0.005 : 0);
-        if (posArr[i * 3 + 1] > 5.5) posArr[i * 3 + 1] = -0.1;
-        if (posArr[i * 3] > 6) posArr[i * 3] = -6;
+    // Munculkan kata-kata kehidupan bercahaya di akhir
+    if (blowTimer > 4.2 && stage === 'blowing') {
+      stage = 'ending';
+      quoteOverlay.classList.add('visible');
     }
-    sparkles.geometry.attributes.position.needsUpdate = true;
+  }
 
-    camera.position.x = 0.05 + Math.sin(t * 0.45) * 0.18;
-    camera.position.y += (1.52 + p * 0.22 - camera.position.y) * 0.04;
-    camera.lookAt(0.05, 0.92 + p * 0.2, 0.18);
+  // Animasi percikan cahaya melayang indah
+  const positions = sparkles.geometry.attributes.position.array;
+  for (let i = 0; i < sparkleCount; i++) {
+    positions[i * 3 + 1] += sparkleVel[i].y;
+    positions[i * 3] += sparkleVel[i].x + Math.sin(t + i) * 0.002;
+    if (positions[i * 3 + 1] > 6) {
+      positions[i * 3 + 1] = 0.2;
+    }
+  }
+  sparkles.geometry.attributes.position.needsUpdate = true;
 
-    renderer.render(scene, camera);
+  renderer.render(scene, camera);
 }
 
 animate();
 
+// Responsif saat ukuran layar berubah
 window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
