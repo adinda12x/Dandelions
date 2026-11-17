@@ -5,20 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Harapan Dandelion — 3D Interactive</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
     <div id="canvas-container"></div>
 
-   <!-- Audio Ruth B - Dandelions (Mulai dari bagian Reff sekitar 01:22) -->
+    <!-- Opsional: upload dandelions.mp3 ke folder yang sama di GitHub jika ingin audio MP3 -->
     <audio id="bg-music" loop preload="auto">
-        <source src="dandelions.mp3#t=82" type="audio/mpeg">
+        <source src="dandelions.mp3" type="audio/mpeg">
     </audio>
 
     <button id="music-toggle" class="glass-btn">🎵 Musik: OFF</button>
 
+    <!-- Lirik berjalan selaras dengan melodi -->
+    <div id="lyric-box" class="lyric-hidden">
+        <p id="lyric-line"></p>
+    </div>
+
+    <!-- Petunjuk Tap Layar -->
     <div id="ui-overlay">
         <div id="instruction-box">
             <p id="instruction-text">🌰 Tap layar — biji dandelion mulai bertunas...</p>
@@ -28,13 +34,14 @@
         </div>
     </div>
 
+    <!-- Kutipan Kehidupan Bercahaya di Akhir Animasi -->
     <div id="quote-container">
         <div class="glowing-card">
-            <h2 class="quote-title">Filosofi Dandelion</h2>
+            <h2 class="quote-title">Makna Dandelion</h2>
             <p class="quote-text">
-                "Dari sebutir biji kecil di tanah, tumbuh menjadi bunga kuning yang segar, lalu mekar menjadi kapas putih yang siap menari bersama angin. Hidup pun begitu—setiap fase penantian selalu menyiapkan kita untuk terbang ke tempat yang lebih indah."
+                "Dari sebutir biji yang diam di tanah, tumbuh menjadi bunga kuning yang segar, lalu mekar menjadi kapas putih yang siap menari bersama angin. Hidup tidak selalu meminta kita terburu-buru—cukup sabar menunggu, percaya, dan merelakan saat waktunya terbang."
             </p>
-            <button id="replay-btn" class="glow-button">Ulangi Harapan ✨</button>
+            <button id="replay-btn" class="glow-button">Ulangi dari Awal ✨</button>
         </div>
     </div>
 
