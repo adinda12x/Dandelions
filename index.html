@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Harapan Dandelion — 3D Cinematic</title>
+    <title>Harapan Dandelion — 3D Interactive</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -12,7 +12,7 @@
 
     <div id="canvas-container"></div>
 
-    <!-- Audio Ruth B - Dandelions (Upload dandelions.mp3 ke root repo GitHub jika ingin vokal asli) -->
+    <!-- Audio Ruth B - Dandelions (Opsional: upload dandelions.mp3 ke root repo GitHub) -->
     <audio id="bg-music" loop preload="auto">
         <source src="dandelions.mp3" type="audio/mpeg">
     </audio>
@@ -21,7 +21,7 @@
 
     <div id="ui-overlay">
         <div id="instruction-box">
-            <p id="instruction-text">✨ Tap layar untuk menumbuhkan Dandelion ✨</p>
+            <p id="instruction-text">🌰 Tap layar — biji dandelion mulai bertunas...</p>
             <div class="progress-bar">
                 <div id="growth-fill"></div>
             </div>
@@ -32,7 +32,7 @@
         <div class="glowing-card">
             <h2 class="quote-title">Filosofi Dandelion</h2>
             <p class="quote-text">
-                "Seperti dandelion yang sabar menunggu angin datang, hidup mengajarkan kita bahwa melepaskan bukanlah akhir—melainkan cara semesta menerbangkan harapan kita untuk tumbuh di tempat yang baru dan lebih indah."
+                "Dari sebutir biji kecil di tanah, tumbuh menjadi bunga kuning yang segar, lalu mekar menjadi kapas putih yang siap menari bersama angin. Hidup pun begitu—setiap fase penantian selalu menyiapkan kita untuk terbang ke tempat yang lebih indah."
             </p>
             <button id="replay-btn" class="glow-button">Ulangi Harapan ✨</button>
         </div>
