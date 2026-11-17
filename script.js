@@ -1,5 +1,5 @@
 // ============================================================================
-// 1. SCENE, KAMERA & PENCAHAYAAN CERAH BERPENDAR (SHADING TIDAK GELAP)
+// 1. SCENE, KAMERA & PENCAHAYAAN CERAH BERPENDAR
 // ============================================================================
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
@@ -14,10 +14,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.38; // Lebih terang & hangat
+renderer.toneMappingExposure = 1.38;
 container.appendChild(renderer.domElement);
 
-// Pencahayaan terang merata (Hemisphere + Key + Warm Fill + Rim)
 const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x4d7c5f, 1.55);
 scene.add(hemiLight);
 
@@ -41,7 +40,6 @@ const dandelionGlow = new THREE.PointLight(0xfef08a, 1.8, 6);
 dandelionGlow.position.set(0.58, 1.35, 0.3);
 scene.add(dandelionGlow);
 
-// Bulan bercahaya lembut & bintang
 const moonMesh = new THREE.Mesh(
     new THREE.SphereGeometry(1.1, 32, 32),
     new THREE.MeshBasicMaterial({ color: 0xfef9c3 })
@@ -104,8 +102,6 @@ for (let i = 0; i < 160; i++) {
 // ============================================================================
 // 3. KARAKTER ANAK KECIL 3D YANG LUCU, EMPUK & BERGERAK LUWES
 // ============================================================================
-// Proporsi anak kecil: kepala agak besar & bulat, tubuh mungil empuk, pipi chubby,
-// gerakan memantul lembut, menengok penasaran, serta tangan & bahu ikut bergoyang.
 const childRoot = new THREE.Group();
 childRoot.position.set(-0.75, -0.02, 0.15);
 childRoot.rotation.y = 0.52;
@@ -113,13 +109,11 @@ scene.add(childRoot);
 
 const skinMat = new THREE.MeshStandardMaterial({ color: 0xffd7be, roughness: 0.48 });
 const cheekMat = new THREE.MeshBasicMaterial({ color: 0xfb7185, transparent: true, opacity: 0.42 });
-const outfitMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.68 }); // Oranye hangat ceria
-const overallMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.65 }); // Biru langit
-const sockMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+const outfitMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.68 });
+const overallMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.65 });
 const shoeMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.45 });
 const hairMat = new THREE.MeshStandardMaterial({ color: 0x3b2314, roughness: 0.6 });
 
-// Tubuh mungil empuk (menggunakan deformasi bola agar tidak kaku)
 const bodyPivot = new THREE.Group();
 bodyPivot.position.set(0, 0.38, 0);
 childRoot.add(bodyPivot);
@@ -130,7 +124,6 @@ const bodyMesh = new THREE.Mesh(bodyGeo, outfitMat);
 bodyMesh.castShadow = true;
 bodyPivot.add(bodyMesh);
 
-// Baju kodok / celemek lucu di depan tubuh
 const bibGeo = new THREE.SphereGeometry(0.22, 24, 20, 0, Math.PI * 2, 0, Math.PI * 0.55);
 bibGeo.scale(1.05, 1.1, 0.95);
 const bibMesh = new THREE.Mesh(bibGeo, overallMat);
@@ -138,7 +131,6 @@ bibMesh.position.set(0, -0.02, 0.06);
 bibMesh.rotation.x = 0.25;
 bodyPivot.add(bibMesh);
 
-// Tas ransel kecil mungil di punggung
 const backpack = new THREE.Mesh(
     new THREE.SphereGeometry(0.19, 20, 20),
     overallMat
@@ -148,7 +140,6 @@ backpack.position.set(0, 0.04, -0.22);
 backpack.castShadow = true;
 bodyPivot.add(backpack);
 
-// Kaki pendek empuk duduk menyilang santai
 const leftLegGroup = new THREE.Group();
 leftLegGroup.position.set(-0.14, -0.18, 0.14);
 bodyPivot.add(leftLegGroup);
@@ -175,7 +166,6 @@ rightShoe.scale.set(0.95, 0.82, 1.4);
 rightShoe.position.set(0.02, -0.02, 0.26);
 rightLegGroup.add(rightLeg, rightShoe);
 
-// Lengan empuk yang bisa mengayun luwes saat menunggu & menunjuk/bereaksi
 const leftArmPivot = new THREE.Group();
 leftArmPivot.position.set(-0.26, 0.12, 0.02);
 bodyPivot.add(leftArmPivot);
@@ -204,7 +194,6 @@ const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.072, 16, 16), skinMa
 rightHand.position.set(0.08, -0.22, 0.15);
 rightArmPivot.add(rightArm, rightHand);
 
-// Kepala anak kecil (bulat proporsional, pipi tembam, mata ekspresif, rambut ikal lembut)
 const headPivot = new THREE.Group();
 headPivot.position.set(0, 0.34, 0.02);
 bodyPivot.add(headPivot);
@@ -216,7 +205,6 @@ headMesh.position.y = 0.22;
 headMesh.castShadow = true;
 headPivot.add(headMesh);
 
-// Pipi chubby merona
 const cheekGeo = new THREE.SphereGeometry(0.065, 16, 16);
 cheekGeo.scale(1.1, 0.75, 0.4);
 const cheekL = new THREE.Mesh(cheekGeo, cheekMat);
@@ -225,12 +213,10 @@ const cheekR = new THREE.Mesh(cheekGeo, cheekMat);
 cheekR.position.set(0.17, 0.16, 0.27);
 headPivot.add(cheekL, cheekR);
 
-// Hidung bulat kecil
 const nose = new THREE.Mesh(new THREE.SphereGeometry(0.032, 14, 14), skinMat);
 nose.position.set(0, 0.19, 0.31);
 headPivot.add(nose);
 
-// Senyum ceria anak kecil
 const mouth = new THREE.Mesh(
     new THREE.TorusGeometry(0.045, 0.01, 10, 24, Math.PI),
     new THREE.MeshBasicMaterial({ color: 0x9f1239 })
@@ -239,7 +225,6 @@ mouth.position.set(0, 0.145, 0.295);
 mouth.rotation.x = Math.PI;
 headPivot.add(mouth);
 
-// Mata besar berbinar + alis ceria
 function createChildEye(side) {
     const eyeGroup = new THREE.Group();
     eyeGroup.position.set(side * 0.115, 0.23, 0.275);
@@ -285,7 +270,6 @@ const eyeL = createChildEye(-1);
 const eyeR = createChildEye(1);
 headPivot.add(eyeL, eyeR);
 
-// Rambut ikal/puff lembut khas anak kecil (tidak kaku)
 const hairGroup = new THREE.Group();
 hairGroup.position.set(0, 0.24, -0.01);
 headPivot.add(hairGroup);
@@ -298,7 +282,6 @@ hairMain.rotation.x = -0.25;
 hairMain.castShadow = true;
 hairGroup.add(hairMain);
 
-// Bola-bola rambut ikal kecil di sekeliling kepala
 const puffCoords = [
     [-0.22, 0.05, 0.18], [-0.11, 0.13, 0.27], [0.0, 0.15, 0.29],
     [0.11, 0.13, 0.27], [0.22, 0.05, 0.18], [-0.28, -0.04, 0.04],
@@ -342,7 +325,6 @@ soil.scale.y = 0.18;
 soil.position.y = 0.43;
 potGroup.add(soil);
 
-// FASE 1: Biji Dandelion di atas tanah (muncul di awal, mengecil saat bertunas)
 const seedBean = new THREE.Mesh(
     new THREE.SphereGeometry(0.055, 16, 16),
     new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.5 })
@@ -351,7 +333,6 @@ seedBean.scale.set(1.2, 0.7, 0.9);
 seedBean.position.set(0.58, 0.47, 0.22);
 scene.add(seedBean);
 
-// Daun-daun segar di pangkal batang
 const leavesGroup = new THREE.Group();
 leavesGroup.position.set(0.58, 0.45, 0.22);
 scene.add(leavesGroup);
@@ -368,7 +349,6 @@ for (let i = 0; i < 6; i++) {
     leaves.push(leaf);
 }
 
-// Batang & Kepala Bunga
 const dandelionGroup = new THREE.Group();
 dandelionGroup.position.set(0.58, 0.45, 0.22);
 scene.add(dandelionGroup);
@@ -387,7 +367,6 @@ const flowerHead = new THREE.Group();
 flowerHead.position.y = 0.01;
 dandelionGroup.add(flowerHead);
 
-// FASE 2: Kelopak Bunga Dandelion Kuning Segar (mekar di tengah pertumbuhan)
 const yellowPetalsGroup = new THREE.Group();
 flowerHead.add(yellowPetalsGroup);
 
@@ -415,7 +394,6 @@ for (let i = 0; i < petalCount; i++) {
     yellowPetals.push({ mesh: petal, baseRotX: ring === 0 ? 0.55 : 0.95 });
 }
 
-// FASE 3 & 4: Bola Kapas Putih Dandelion Siap Terbang & Biji Betrbangan
 const puffCore = new THREE.Mesh(
     new THREE.SphereGeometry(0.05, 16, 16),
     new THREE.MeshStandardMaterial({ color: 0xfef08a })
@@ -506,101 +484,137 @@ const sparkles = new THREE.Points(
 scene.add(sparkles);
 
 // ============================================================================
-// 6. AUDIO RUTH B - DANDELIONS + MELODI LEMBUT OTOMATIS
+// 6. SISTEM AUDIO ANTI-BLOKIR BROWSER (MP3 RUTH B + HARPA/PIANO LEMBUT)
 // ============================================================================
 const bgMusic = document.getElementById('bg-music');
 const musicToggle = document.getElementById('music-toggle');
 
 let audioCtx = null;
-let synthTimer = null;
-let mp3Available = true;
+let melodyInterval = null;
 let isMusicPlaying = false;
-let audioInitialized = false;
+let usingMp3 = false;
 
-const melodyNotes = [
-    349.23, 440.00, 523.25, 659.25,
-    293.66, 349.23, 440.00, 523.25,
-    233.08, 293.66, 349.23, 440.00,
-    261.63, 329.63, 392.00, 523.25
+// Progresi nada hangat bernuansa Dandelions (Fmaj7 -> Dm7 -> Bbmaj7 -> C)
+const chordProgression = [
+    [349.23, 440.00, 523.25, 659.25],
+    [293.66, 349.23, 440.00, 523.25],
+    [233.08, 293.66, 349.23, 440.00],
+    [261.63, 329.63, 392.00, 523.25]
 ];
-let noteIdx = 0;
+let stepCounter = 0;
 
-function playSoftTone(freq) {
+function triggerSoftNote(freq) {
     if (!audioCtx || audioCtx.state !== 'running') return;
     const now = audioCtx.currentTime;
+
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = 'sine';
+
+    osc.type = 'triangle';
     osc.frequency.setValueAtTime(freq, now);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.05, now + 0.15);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+
+    // Ramp linear aman di semua HP/browser
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.11, now + 0.08);
+    gain.gain.linearRampToValueAtTime(0.001, now + 1.4);
+
     osc.connect(gain);
     gain.connect(audioCtx.destination);
+
     osc.start(now);
-    osc.stop(now + 1.85);
+    osc.stop(now + 1.45);
 }
 
-function startSynthMelody() {
+function startBuiltInMelody() {
+    if (melodyInterval) clearInterval(melodyInterval);
+
+    const playStep = () => {
+        if (!isMusicPlaying || usingMp3) return;
+        const chord = chordProgression[Math.floor(stepCounter / 4) % chordProgression.length];
+        const note = chord[stepCounter % chord.length];
+        triggerSoftNote(note);
+        stepCounter++;
+    };
+
+    playStep();
+    melodyInterval = setInterval(playStep, 480);
+}
+
+function stopBuiltInMelody() {
+    if (melodyInterval) {
+        clearInterval(melodyInterval);
+        melodyInterval = null;
+    }
+}
+
+function unlockAndStartAudio() {
     if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContextClass();
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) audioCtx = new AudioCtx();
     }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    if (synthTimer) clearInterval(synthTimer);
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
 
-    playSoftTone(melodyNotes[noteIdx % melodyNotes.length]);
-    noteIdx++;
-    synthTimer = setInterval(() => {
-        if (isMusicPlaying) {
-            playSoftTone(melodyNotes[noteIdx % melodyNotes.length]);
-            noteIdx++;
-        }
-    }, 640);
-}
-
-if (bgMusic) bgMusic.addEventListener('error', () => { mp3Available = false; });
-
-function initOrPlayMusic() {
     if (isMusicPlaying) return;
-    if (bgMusic && mp3Available) {
-        bgMusic.play()
-            .then(() => {
-                isMusicPlaying = true;
-                audioInitialized = true;
-                musicToggle.textContent = '🎵 Musik: ON';
-            })
-            .catch(() => {
-                mp3Available = false;
-                isMusicPlaying = true;
-                audioInitialized = true;
-                startSynthMelody();
-                musicToggle.textContent = '🎵 Melodi: ON';
-            });
-    } else {
-        isMusicPlaying = true;
-        audioInitialized = true;
-        startSynthMelody();
-        musicToggle.textContent = '🎵 Melodi: ON';
+    isMusicPlaying = true;
+
+    // Coba putar dandelions.mp3 jika file tersedia di GitHub Pages
+    if (bgMusic && bgMusic.getAttribute('src')) {
+        bgMusic.volume = 0.85;
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    usingMp3 = true;
+                    stopBuiltInMelody();
+                    musicToggle.textContent = '🎵 Dandelions: ON';
+                })
+                .catch(() => {
+                    usingMp3 = false;
+                    startBuiltInMelody();
+                    musicToggle.textContent = '🎵 Melodi: ON';
+                });
+            return;
+        }
     }
+
+    usingMp3 = false;
+    startBuiltInMelody();
+    musicToggle.textContent = '🎵 Melodi: ON';
 }
+
+// Aktifkan suara langsung pada sentuhan pertama di mana saja di layar
+['touchstart', 'click', 'pointerdown'].forEach((evtName) => {
+    document.addEventListener(evtName, unlockAndStartAudio, { once: true, passive: true });
+});
 
 musicToggle.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (!audioInitialized) return initOrPlayMusic();
-    if (isMusicPlaying) {
-        isMusicPlaying = false;
-        if (bgMusic && mp3Available) bgMusic.pause();
-        if (synthTimer) clearInterval(synthTimer);
-        musicToggle.textContent = '🎵 Musik: OFF';
-    } else {
+    if (!audioCtx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) audioCtx = new AudioCtx();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+
+    if (!isMusicPlaying) {
         isMusicPlaying = true;
-        if (bgMusic && mp3Available) {
-            bgMusic.play().catch(() => { mp3Available = false; startSynthMelody(); });
+        if (usingMp3 && bgMusic) {
+            bgMusic.play().catch(() => {
+                usingMp3 = false;
+                startBuiltInMelody();
+            });
         } else {
-            startSynthMelody();
+            startBuiltInMelody();
         }
-        musicToggle.textContent = mp3Available ? '🎵 Musik: ON' : '🎵 Melodi: ON';
+        musicToggle.textContent = usingMp3 ? '🎵 Dandelions: ON' : '🎵 Melodi: ON';
+    } else {
+        isMusicPlaying = false;
+        if (bgMusic) bgMusic.pause();
+        stopBuiltInMelody();
+        musicToggle.textContent = '🎵 Musik: OFF';
     }
 });
 
@@ -633,7 +647,7 @@ function updateStageMessage(val) {
 }
 
 function handleTap() {
-    initOrPlayMusic();
+    unlockAndStartAudio();
     if (windActive) return;
 
     targetGrowth = Math.min(100, targetGrowth + 15);
@@ -655,6 +669,7 @@ container.addEventListener('pointerdown', handleTap);
 
 replayBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+    unlockAndStartAudio();
     growthProgress = 0;
     targetGrowth = 0;
     windActive = false;
@@ -690,7 +705,7 @@ replayBtn.addEventListener('click', (e) => {
 });
 
 // ============================================================================
-// 8. LOOP ANIMASI REAL-TIME (GERAKAN ANAK LUWES & TRANSISI BUNGA)
+// 8. LOOP ANIMASI REAL-TIME
 // ============================================================================
 const clock = new THREE.Clock();
 let blinkTimer = 2.0;
@@ -702,26 +717,21 @@ function animate() {
     const dt = clock.getDelta();
     const t = clock.getElapsedTime();
 
-    // 1. Gerakan Anak Kecil yang Luwes & Penasaran (bukan kaku)
-    // Memantul lembut seperti anak kecil duduk bersemangat
     bodyPivot.position.y = 0.38 + Math.abs(Math.sin(t * 2.4)) * 0.022;
     bodyPivot.rotation.z = Math.sin(t * 1.6) * 0.05;
     bodyPivot.rotation.x = 0.08 + Math.sin(t * 2.4) * 0.03;
 
-    // Kepala memiring lucu & menengok mengikuti bunga
-    headPivot.rotation.z = Math.sin(t * 1.4) * 0.14; // Miring lucu ke kiri-kanan
+    headPivot.rotation.z = Math.sin(t * 1.4) * 0.14;
     headPivot.rotation.y = Math.sin(t * 1.1) * 0.12;
     const lookPitch = windActive
         ? -0.35 - Math.sin(t * 1.5) * 0.06
         : -0.05 - (growthProgress / 100) * 0.25;
     headPivot.rotation.x += (lookPitch - headPivot.rotation.x) * 0.08;
 
-    // Lengan mengayun kecil & bereaksi saat bunga mekar/terbang
     const exciteBoost = windActive ? 0.35 : (growthProgress / 100) * 0.18;
     leftArmPivot.rotation.x = Math.sin(t * 2.6) * 0.16 - exciteBoost;
     rightArmPivot.rotation.x = -Math.sin(t * 2.6) * 0.16 - exciteBoost;
 
-    // Kedipan mata anak kecil
     if (!isBlinking && t > blinkTimer) {
         isBlinking = true;
         blinkPhase = 0;
@@ -739,27 +749,22 @@ function animate() {
         }
     }
 
-    // 2. Transisi Dandelion: Biji -> Bunga Segar -> Kapas Siap Terbang
     growthProgress += (targetGrowth - growthProgress) * 0.08;
     const p = growthProgress / 100;
 
-    // Biji mengecil saat mulai tumbuh
     const beanScale = Math.max(0.01, (1 - p * 3.2) * 1.1);
     seedBean.scale.set(beanScale * 1.2, beanScale * 0.7, beanScale * 0.9);
 
-    // Daun muda muncul di awal
     const leafScale = Math.min(1, Math.max(0.01, p * 2.2));
     leaves.forEach((leaf, idx) => {
         leaf.scale.set(leafScale, leafScale, leafScale * 0.35);
         leaf.rotation.z = Math.sin(t * 2 + idx) * 0.05;
     });
 
-    // Batang tumbuh
     const stemHeight = 0.01 + p * 1.25;
     stem.scale.y = stemHeight;
     flowerHead.position.y = stemHeight;
 
-    // Bunga kuning segar mekar di rentang 25% - 75%, lalu menguncup saat berubah jadi kapas
     const freshBloom = p < 0.75
         ? Math.max(0.01, (p - 0.2) / 0.55)
         : Math.max(0.01, 1 - (p - 0.75) / 0.25);
@@ -770,20 +775,17 @@ function animate() {
         item.mesh.rotation.x = item.baseRotX + Math.sin(t * 3 + idx) * 0.06;
     });
 
-    // Bola kapas putih dandelion muncul mulai 65% hingga siap terbang
     const puffReady = Math.max(0.01, (p - 0.62) / 0.38);
     puffCore.scale.setScalar(puffReady);
 
     seeds.forEach((seed) => {
         if (!seed.isFlying) {
-            // Saat 85% - 100%, kapas bergetar halus tanda siap terbang
             const tremble = p > 0.85 ? Math.sin(t * 22 + seed.releaseTime * 10) * 0.04 : 0;
             const s = puffReady + tremble;
             seed.mesh.scale.set(s, s, s);
         }
     });
 
-    // 3. Angin & Biji Dandelion Terbang
     const windFactor = windActive ? 1.0 : 0.25;
     grassBlades.forEach((g) => {
         g.mesh.rotation.z = Math.sin(t * 2.5 + g.phase) * 0.08 * windFactor - (windActive ? 0.16 : 0.02);
@@ -825,7 +827,6 @@ function animate() {
         dandelionGroup.rotation.z = Math.sin(t * 1.5) * 0.03;
     }
 
-    // 4. Percikan Cahaya
     const posArr = sparkles.geometry.attributes.position.array;
     for (let i = 0; i < sparkleCount; i++) {
         posArr[i * 3 + 1] += sparkleSpeeds[i];
@@ -835,7 +836,6 @@ function animate() {
     }
     sparkles.geometry.attributes.position.needsUpdate = true;
 
-    // 5. Kamera Halus
     camera.position.x = 0.1 + Math.sin(t * 0.45) * 0.22;
     camera.position.y += (1.68 + p * 0.25 - camera.position.y) * 0.04;
     camera.lookAt(0.05, 0.98 + p * 0.22, 0.18);
