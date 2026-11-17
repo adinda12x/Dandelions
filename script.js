@@ -17,13 +17,11 @@ container.appendChild(renderer.domElement);
 const ambientLight = new THREE.AmbientLight(0x405070, 1.3);
 scene.add(ambientLight);
 
-// Cahaya Bulan / Langit
 const moonLight = new THREE.DirectionalLight(0xaaccff, 1.2);
 moonLight.position.set(-5, 8, 5);
 moonLight.castShadow = true;
 scene.add(moonLight);
 
-// Cahaya Hangat di Dekat Dandelion
 const dandelionGlow = new THREE.PointLight(0xffdd77, 1.5, 6);
 dandelionGlow.position.set(0.6, 1.8, 0.5);
 scene.add(dandelionGlow);
@@ -39,22 +37,19 @@ scene.add(ground);
 // --- MEMBUAT KARAKTER ANAK KECIL 3D ---
 const childGroup = new THREE.Group();
 childGroup.position.set(-0.9, 0, 0.2);
-childGroup.rotation.y = 0.45; // Menghadap ke arah pot bunga
+childGroup.rotation.y = 0.45;
 scene.add(childGroup);
 
-// Material Karakter
 const skinMat = new THREE.MeshStandardMaterial({ color: 0xffd1b3, roughness: 0.6 });
 const shirtMat = new THREE.MeshStandardMaterial({ color: 0x4a90e2, roughness: 0.7 });
 const pantsMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.8 });
 const hairMat = new THREE.MeshStandardMaterial({ color: 0x2b1b17, roughness: 0.9 });
 
-// Badan (Duduk)
 const body = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.35, 0.75, 16), shirtMat);
 body.position.y = 0.55;
 body.castShadow = true;
 childGroup.add(body);
 
-// Kaki (Duduk menekuk ke depan)
 const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.6, 12), pantsMat);
 legL.position.set(-0.15, 0.15, 0.25);
 legL.rotation.x = Math.PI / 2.2;
@@ -65,7 +60,6 @@ legR.position.set(0.15, 0.15, 0.25);
 legR.rotation.x = Math.PI / 2.2;
 childGroup.add(legR);
 
-// Kepala
 const headGroup = new THREE.Group();
 headGroup.position.set(0, 1.15, 0);
 childGroup.add(headGroup);
@@ -74,12 +68,10 @@ const head = new THREE.Mesh(new THREE.SphereGeometry(0.32, 24, 24), skinMat);
 head.castShadow = true;
 headGroup.add(head);
 
-// Rambut
 const hair = new THREE.Mesh(new THREE.SphereGeometry(0.335, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.58), hairMat);
 hair.rotation.x = -0.2;
 headGroup.add(hair);
 
-// Mata Anak Kecil
 const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
 const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), eyeMat);
 eyeL.position.set(-0.11, 0.02, 0.29);
@@ -89,7 +81,6 @@ const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), eyeMat);
 eyeR.position.set(0.11, 0.02, 0.29);
 headGroup.add(eyeR);
 
-// Tangan menopang dagu (menunggu bunga tumbuh)
 const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.06, 0.5, 10), skinMat);
 armL.position.set(-0.28, 0.78, 0.22);
 armL.rotation.set(-0.8, 0, -0.3);
@@ -127,15 +118,13 @@ const dandelionGroup = new THREE.Group();
 dandelionGroup.position.set(0.65, 0.55, 0.2);
 scene.add(dandelionGroup);
 
-// Batang Dandelion
 const stemGeo = new THREE.CylinderGeometry(0.02, 0.035, 1, 12);
-stemGeo.translate(0, 0.5, 0); // Titik pusat di bawah agar tumbuh ke atas
+stemGeo.translate(0, 0.5, 0);
 const stemMat = new THREE.MeshStandardMaterial({ color: 0x6ab04c, roughness: 0.6 });
 const stem = new THREE.Mesh(stemGeo, stemMat);
-stem.scale.set(1, 0.05, 1); // Mulai dari tunas kecil
+stem.scale.set(1, 0.05, 1);
 dandelionGroup.add(stem);
 
-// Kepala & Biji-Biji Kapas Dandelion
 const headAnchor = new THREE.Group();
 headAnchor.position.y = 0.05;
 dandelionGroup.add(headAnchor);
@@ -146,15 +135,12 @@ const core = new THREE.Mesh(
 );
 headAnchor.add(core);
 
-// Membuat 95 Biji Kapas Dandelion yang Bisa Terbang
 const seeds = [];
 const seedCount = 95;
 const seedMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
 
 for (let i = 0; i < seedCount; i++) {
     const seedContainer = new THREE.Group();
-
-    // Distribusi Fibonacci Sphere agar bulat sempurna
     const phi = Math.acos(-1 + (2 * i) / seedCount);
     const theta = Math.sqrt(seedCount * Math.PI) * phi;
 
@@ -164,21 +150,18 @@ for (let i = 0; i < seedCount; i++) {
         Math.cos(phi)
     );
 
-    // Tangkai biji
     const stalkGeo = new THREE.CylinderGeometry(0.003, 0.003, 0.25, 4);
     stalkGeo.translate(0, 0.125, 0);
     const stalk = new THREE.Mesh(stalkGeo, seedMat);
 
-    // Bulu kapas di ujung biji
     const fluff = new THREE.Mesh(new THREE.OctahedronGeometry(0.032, 0), seedMat);
     fluff.position.y = 0.25;
 
     seedContainer.add(stalk);
     seedContainer.add(fluff);
 
-    // Arahkan biji keluar dari inti bunga
     seedContainer.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
-    seedContainer.scale.set(0.01, 0.01, 0.01); // Awalnya kuncup
+    seedContainer.scale.set(0.01, 0.01, 0.01);
 
     headAnchor.add(seedContainer);
 
@@ -214,7 +197,6 @@ for (let i = 0; i < sparkleCount; i++) {
 
 sparkleGeo.setAttribute('position', new THREE.BufferAttribute(sparklePos, 3));
 
-// Membuat tekstur lingkaran bercahaya untuk partikel
 const spriteCanvas = document.createElement('canvas');
 spriteCanvas.width = 32;
 spriteCanvas.height = 32;
@@ -238,37 +220,140 @@ const sparkleMat = new THREE.PointsMaterial({
 const sparkles = new THREE.Points(sparkleGeo, sparkleMat);
 scene.add(sparkles);
 
-// --- LOGIKA AUDIO (LAGU RUTH B - DANDELIONS) ---
+// --- LOGIKA AUDIO: MP3 RUTH B + FALLBACK MELODI LEMBUT OTOMATIS ---
 const bgMusic = document.getElementById('bg-music');
 const musicToggle = document.getElementById('music-toggle');
-let isMusicPlaying = false;
 
-function startMusic() {
-    if (isMusicPlaying) return;
-    bgMusic.play().then(() => {
-        isMusicPlaying = true;
-        musicToggle.textContent = '🎵 Musik: ON';
-    }).catch(() => {
-        // Fallback jika file dandelions.mp3 belum diunggah ke GitHub
-        musicToggle.textContent = '🎵 Upload dandelions.mp3';
+let audioCtx = null;
+let synthTimer = null;
+let mp3Available = true;
+let isMusicPlaying = false;
+let audioInitialized = false;
+
+// Melodi arpeggio lembut (F Major / Dm / Bb / C - nuansa hangat seperti Dandelions)
+const melodyNotes = [
+    349.23, 440.00, 523.25, 659.25, // F maj7
+    293.66, 349.23, 440.00, 523.25, // Dm7
+    233.08, 293.66, 349.23, 440.00, // Bb maj7
+    261.63, 329.63, 392.00, 523.25  // C
+];
+let noteIndex = 0;
+
+function playSoftNote(freq) {
+    if (!audioCtx || audioCtx.state !== 'running') return;
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+
+    // Amplop suara halus (attack pelan, decay panjang)
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.05, now + 0.18);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.9);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(now);
+    osc.stop(now + 2.0);
+}
+
+function startSynthMusic() {
+    if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    if (synthTimer) clearInterval(synthTimer);
+
+    playSoftNote(melodyNotes[noteIndex % melodyNotes.length]);
+    noteIndex++;
+
+    synthTimer = setInterval(() => {
+        if (isMusicPlaying) {
+            playSoftNote(melodyNotes[noteIndex % melodyNotes.length]);
+            noteIndex++;
+        }
+    }, 650);
+}
+
+function stopSynthMusic() {
+    if (synthTimer) {
+        clearInterval(synthTimer);
+        synthTimer = null;
+    }
+}
+
+// Cek apakah dandelions.mp3 ada di repo GitHub
+if (bgMusic) {
+    bgMusic.addEventListener('error', () => {
+        mp3Available = false;
     });
+}
+
+function initOrPlayMusic() {
+    if (isMusicPlaying) return;
+
+    if (bgMusic && mp3Available) {
+        bgMusic.play()
+            .then(() => {
+                isMusicPlaying = true;
+                audioInitialized = true;
+                musicToggle.textContent = '🎵 Musik: ON';
+            })
+            .catch(() => {
+                // Jika dandelions.mp3 belum diunggah, otomatis pakai melodi lembut bawaan
+                mp3Available = false;
+                isMusicPlaying = true;
+                audioInitialized = true;
+                startSynthMusic();
+                musicToggle.textContent = '🎵 Melodi: ON';
+            });
+    } else {
+        isMusicPlaying = true;
+        audioInitialized = true;
+        startSynthMusic();
+        musicToggle.textContent = '🎵 Melodi: ON';
+    }
+}
+
+function toggleMusic() {
+    if (!audioInitialized) {
+        initOrPlayMusic();
+        return;
+    }
+
+    if (isMusicPlaying) {
+        isMusicPlaying = false;
+        if (bgMusic && mp3Available) bgMusic.pause();
+        stopSynthMusic();
+        musicToggle.textContent = '🎵 Musik: OFF';
+    } else {
+        isMusicPlaying = true;
+        if (bgMusic && mp3Available) {
+            bgMusic.play().catch(() => {
+                mp3Available = false;
+                startSynthMusic();
+            });
+        } else {
+            startSynthMusic();
+        }
+        musicToggle.textContent = mp3Available ? '🎵 Musik: ON' : '🎵 Melodi: ON';
+    }
 }
 
 musicToggle.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (bgMusic.paused) {
-        bgMusic.play();
-        isMusicPlaying = true;
-        musicToggle.textContent = '🎵 Musik: ON';
-    } else {
-        bgMusic.pause();
-        isMusicPlaying = false;
-        musicToggle.textContent = '🎵 Musik: OFF';
-    }
+    toggleMusic();
 });
 
 // --- LOGIKA PERTUMBUHAN & INTERAKSI TAP LAYAR ---
-let growthProgress = 0; // 0 hingga 100
+let growthProgress = 0;
 let targetGrowth = 0;
 let isBloomed = false;
 let windActive = false;
@@ -280,16 +365,14 @@ const uiOverlay = document.getElementById('ui-overlay');
 const quoteContainer = document.getElementById('quote-container');
 const replayBtn = document.getElementById('replay-btn');
 
-// Fungsi saat layar di-tap
 function handleTap() {
-    startMusic();
+    initOrPlayMusic();
 
     if (isBloomed) return;
 
     targetGrowth = Math.min(100, targetGrowth + 14);
     growthFill.style.width = `${targetGrowth}%`;
 
-    // Efek lonjakan cahaya saat di-tap
     dandelionGlow.intensity = 3.5;
     setTimeout(() => { dandelionGlow.intensity = 1.5; }, 200);
 
@@ -311,8 +394,8 @@ function handleTap() {
 
 container.addEventListener('pointerdown', handleTap);
 
-// Tombol Ulangi Animasi
-replayBtn.addEventListener('click', () => {
+replayBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     growthProgress = 0;
     targetGrowth = 0;
     isBloomed = false;
@@ -324,13 +407,11 @@ replayBtn.addEventListener('click', () => {
     uiOverlay.style.opacity = '1';
     quoteContainer.classList.remove('visible');
 
-    // Reset posisi dan ukuran bunga & biji
     stem.scale.set(1, 0.05, 1);
     headAnchor.position.y = 0.05;
     dandelionGroup.rotation.z = 0;
 
     seeds.forEach((seed, i) => {
-        // Lepas dari scene jika sebelumnya sudah dilepas ke udara
         if (seed.mesh.parent !== headAnchor) {
             scene.remove(seed.mesh);
             headAnchor.add(seed.mesh);
@@ -356,19 +437,15 @@ function animate() {
     requestAnimationFrame(animate);
     const elapsedTime = clock.getElapsedTime();
 
-    // 1. Animasi Anak Kecil Menunggu (Bernapas & Mendongak Mengikuti Bunga)
     childGroup.position.y = Math.sin(elapsedTime * 2) * 0.015;
-    const lookHeight = 0.5 + (growthProgress / 100) * 1.4;
-    headGroup.rotation.x = -0.15 - (growthProgress / 100) * 0.35; // Kepala mendongak seiring bunga tumbuh
+    headGroup.rotation.x = -0.15 - (growthProgress / 100) * 0.35;
     headGroup.rotation.z = Math.sin(elapsedTime * 1.5) * 0.04;
 
-    // 2. Animasi Pertumbuhan Batang & Mekarnya Bunga
     growthProgress += (targetGrowth - growthProgress) * 0.08;
     const stemHeight = 0.05 + (growthProgress / 100) * 1.45;
     stem.scale.y = stemHeight;
     headAnchor.position.y = stemHeight;
 
-    // Mekarkan biji kapas saat pertumbuhan di atas 45%
     const bloomFactor = Math.max(0, (growthProgress - 45) / 55);
     seeds.forEach((seed) => {
         if (!seed.isFlying) {
@@ -377,18 +454,14 @@ function animate() {
         }
     });
 
-    // 3. Animasi Angin Berhembus & Biji Dandelion Terbang
     if (windActive) {
         windTimer += 0.016;
-
-        // Batang bergoyang tertiup angin ke kanan
         dandelionGroup.rotation.z = -Math.sin(elapsedTime * 3) * 0.08 - 0.18;
 
         seeds.forEach((seed) => {
             if (windTimer > seed.delay) {
                 if (!seed.isFlying) {
                     seed.isFlying = true;
-                    // Pindahkan biji dari tangkai bunga ke ruang dunia 3D agar terbang bebas
                     const worldPos = new THREE.Vector3();
                     const worldQuat = new THREE.Quaternion();
                     seed.mesh.getWorldPosition(worldPos);
@@ -400,7 +473,6 @@ function animate() {
                     seed.mesh.quaternion.copy(worldQuat);
                 }
 
-                // Gerakkan biji terbang terbawa angin ke kanan atas dengan gelombang lembut
                 seed.mesh.position.x += seed.velocity.x;
                 seed.mesh.position.y += seed.velocity.y + Math.sin(elapsedTime * 3 + seed.delay) * 0.006;
                 seed.mesh.position.z += seed.velocity.z;
@@ -411,22 +483,18 @@ function animate() {
             }
         });
 
-        // Munculkan kata-kata kehidupan bercahaya setelah biji berterbangan
         if (windTimer > 3.8 && !quoteContainer.classList.contains('visible')) {
             quoteContainer.classList.add('visible');
         }
     } else {
-        // Angin sepoi-sepoi halus sebelum mekar penuh
         dandelionGroup.rotation.z = Math.sin(elapsedTime * 1.5) * 0.03;
     }
 
-    // 4. Animasi Percikan Cahaya / Kunang-kunang
     const positions = sparkles.geometry.attributes.position.array;
     for (let i = 0; i < sparkleCount; i++) {
         positions[i * 3 + 1] += sparkleSpeeds[i];
         positions[i * 3] += Math.sin(elapsedTime + i) * 0.003;
 
-        // Jika partikel naik terlalu tinggi, kembalikan ke bawah
         if (positions[i * 3 + 1] > 6.5) {
             positions[i * 3 + 1] = 0;
         }
@@ -438,7 +506,6 @@ function animate() {
 
 animate();
 
-// Responsif saat ukuran layar HP/Laptop berubah
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
