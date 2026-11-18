@@ -395,7 +395,7 @@ const btnReplay = document.getElementById('btn-replay');
 // Audio Setup
 const bgMusic = document.getElementById('bg-music');
 const btnAudio = document.getElementById('btn-audio');
-const uploadMp3 = document.getElementById('upload-mp3');
+const lagu.Mp3 = document.getElementById('lagu.mp3');
 let isPlaying = false;
 
 function tryPlayMusic() {
